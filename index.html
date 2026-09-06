@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>あんしん スマホ教室 v1.6.0 - 80代シニア向け Android 15 やさしいスマホ学習</title>
+  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="80代シニア向け 本物キーボード（Gboard）完全連動スマホ＆防犯がくしゅうアプリ v1.6.0">
+
+  <!-- PWA Settings & Apple Touch Icon (SVG Shield Data URI) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="あんしんスマホ教室">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2310b981'/><path d='M50 18 L78 30 V52 C78 70 50 82 50 82 C50 82 22 70 22 52 V30 Z' fill='%23ffffff'/><path d='M44 56 L36 48 L30 54 L44 68 L70 42 L64 36 Z' fill='%2310b981'/></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2310b981'/><path d='M50 18 L78 30 V52 C78 70 50 82 50 82 C50 82 22 70 22 52 V30 Z' fill='%23ffffff'/><path d='M44 56 L36 48 L30 54 L44 68 L70 42 L64 36 Z' fill='%2310b981'/></svg>">
+
+  <!-- Web Manifest Data URI -->
+  <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22%E3%81%82%E3%82%93%E3%81%97%E3%82%93%20%E3%82%B9%E3%83%9E%E3%83%8B%E6%95%99%E2%85%A5%22%2C%22short_name%22%3A%22%E3%81%82%E3%82%93%E3%81%97%E3%82%93%E3%82%B9%E3%83%9E%E3%83%8B%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Zen Maru Gothic for senior readability -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Zen Maru Gothic', 'Hiragino Sans', 'Meiryo', sans-serif;
+      background-color: #0f172a;
+      color: #0f172a;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      font-size: 22px;
+      line-height: 1.5;
+    }
+
+    /* 超大文字・高視認性設定 */
+    .text-senior-base { font-size: 22px; line-height: 1.5; }
+    .text-senior-lg { font-size: 26px; line-height: 1.4; }
+    .text-senior-xl { font-size: 30px; line-height: 1.3; }
+
+    /* 最低64px以上の超大型タップ領域ボタン */
+    .touch-btn {
+      min-height: 64px;
+      touch-action: manipulation;
+    }
+
+    /* キーボード位置ガイドの発光枠アニメーション */
+    @keyframes keyPulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.9); }
+      50% { transform: scale(1.04); box-shadow: 0 0 0 12px rgba(234, 179, 8, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+    }
+
+    .key-target-active {
+      animation: keyPulse 1.2s infinite ease-in-out !important;
+      background-color: #fde047 !important;
+      color: #0f172a !important;
+      font-weight: 900 !important;
+      border: 4px solid #ca8a04 !important;
+      z-index: 20;
+    }
+
+    /* スキャン線アニメーション (Googleレンズ用) */
+    @keyframes scanLine {
+      0% { top: 5%; opacity: 0.9; }
+      50% { top: 85%; opacity: 1; }
+      100% { top: 5%; opacity: 0.9; }
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 5%;
+      width: 90%;
+      height: 6px;
+      background: linear-gradient(90deg, transparent, #38bdf8, #fef08a, #38bdf8, transparent);
+      box-shadow: 0 0 18px #38bdf8;
+      animation: scanLine 1.8s infinite ease-in-out;
+    }
+
+    /* カスタムスクロールバー */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 5px; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-900 flex flex-col justify-between max-w-xl mx-auto shadow-2xl relative border-x-2 border-slate-700">
+
+  <!-- 画面最上部に固定ナビゲーション -->
+  <nav class="sticky top-0 z-50 bg-slate-900 border-b-4 border-amber-400 shadow-xl">
+    <div class="bg-amber-400 text-slate-950 px-3 py-2 font-black flex items-center justify-between border-b border-amber-500">
+      <div class="flex items-center space-x-2">
+        <span class="text-3xl">📱</span>
+        <span class="text-2xl tracking-tight">あんしん スマホ教室 <span class="text-xs bg-slate-950 text-amber-300 px-2 py-0.5 rounded-full border border-amber-300 font-bold">v1.6.0</span></span>
+      </div>
+      <div class="bg-slate-900 text-amber-300 px-3 py-1 rounded-full text-lg border-2 border-amber-300 flex items-center space-x-1 shadow-sm font-black">
+        <span>⭐</span>
+        <span id="score-display">0</span>
+        <span>点</span>
+      </div>
+    </div>
+
+    <!-- 5つの分割タブ navigation (高さ64px以上超大型大ボタン・専門用語完全排除) -->
+    <div class="grid grid-cols-5 gap-1 p-1.5 bg-slate-800 text-center">
+      <button onclick="switchTab('input')" id="nav-btn-input" class="py-2.5 px-0.5 rounded-xl flex flex-col items-center justify-center font-black transition bg-amber-400 text-slate-950 border-2 border-amber-500 shadow-md min-h-[64px]">
+        <span class="text-2xl">⌨️</span>
+        <span class="text-[13px] sm:text-[15px] font-black leading-tight mt-0.5">① もじを入れる</span>
+      </button>
+
+      <button onclick="switchTab('voice')" id="nav-btn-voice" class="py-2.5 px-0.5 rounded-xl flex flex-col items-center justify-center font-black transition text-slate-300 hover:bg-slate-700 min-h-[64px]">
+        <span class="text-2xl">🎤</span>
+        <span class="text-[13px] sm:text-[15px] font-black leading-tight mt-0.5">② 声で入れる</span>
+      </button>
+
+      <button onclick="switchTab('search')" id="nav-btn-search" class="py-2.5 px-0.5 rounded-xl flex flex-col items-center justify-center font-black transition text-slate-300 hover:bg-slate-700 min-h-[64px]">
+        <span class="text-2xl">🔍</span>
+        <span class="text-[13px] sm:text-[15px] font-black leading-tight mt-0.5">③ もじで探す</span>
+      </button>
+
+      <button onclick="switchTab('lens')" id="nav-btn-lens" class="py-2.5 px-0.5 rounded-xl flex flex-col items-center justify-center font-black transition text-slate-300 hover:bg-slate-700 min-h-[64px]">
+        <span class="text-2xl">📷</span>
+        <span class="text-[13px] sm:text-[15px] font-black leading-tight mt-0.5">④ 写真で探す</span>
+      </button>
+
+      <button onclick="switchTab('security')" id="nav-btn-security" class="py-2.5 px-0.5 rounded-xl flex flex-col items-center justify-center font-black transition text-slate-300 hover:bg-slate-700 min-h-[64px]">
+        <span class="text-2xl">🛡️</span>
+        <span class="text-[13px] sm:text-[15px] font-black leading-tight mt-0.5">⑤ あぶない！</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- フク先生（ナビゲーター）メッセージエリア -->
+  <section class="p-3 bg-slate-800 border-b-4 border-amber-400">
+    <div class="bg-amber-50 p-4 rounded-2xl border-4 border-amber-300 shadow-md flex items-center space-x-3">
+      <div class="text-5xl bg-amber-200 p-2 rounded-2xl border-2 border-amber-400 shadow-sm flex-shrink-0">
+        🦉
+      </div>
+      <div class="flex-1">
+        <div class="text-xs font-black text-amber-900 tracking-wider">フク先生のアドバイス</div>
+        <div id="fuku-message" class="text-senior-base font-black text-slate-900 mt-0.5">
+          ようこそ！したの黄いろい枠をおして、スマホの本ものキーボードで文字を入れてみましょう！
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- メインコンテンツ -->
+  <main class="flex-1 p-3.5 pb-12 space-y-5 overflow-y-auto">
+
+    <!-- ==================== タブ① もじを入れる (Chapter 1) ==================== -->
+    <div id="tab-input" class="tab-page space-y-4">
+
+      <!-- キー操作スタイルの切り替え（専門用語フリック・トグル完全廃止） -->
+      <div class="bg-slate-800 p-2 rounded-2xl flex border-2 border-slate-600 shadow-inner">
+        <button id="btn-toggle-mode" onclick="setKeyboardMode('toggle')" class="flex-1 py-3.5 font-black text-senior-base rounded-xl transition bg-amber-400 text-slate-950 shadow-md border-2 border-amber-500">
+          👈 1文字づつおす
+        </button>
+        <button id="btn-flick-mode" onclick="setKeyboardMode('flick')" class="flex-1 py-3.5 font-black text-senior-base text-slate-300 rounded-xl transition">
+          👉 指をすべらせておす
+        </button>
+      </div>
+
+      <!-- ステップカード -->
+      <div class="bg-white p-5 rounded-3xl border-4 border-slate-300 shadow-xl space-y-4">
+        <div class="flex justify-between items-center border-b-2 pb-3 border-slate-200">
+          <span id="step-number-tag" class="bg-blue-700 text-white font-black text-senior-base px-4 py-1.5 rounded-full shadow">
+            じゅんじょ 1 / 5
+          </span>
+          <span id="step-title-text" class="font-black text-slate-900 text-senior-lg">
+            「い」を入れてみよう
+          </span>
+        </div>
+
+        <div id="step-instruction" class="text-senior-lg font-black text-blue-950 bg-blue-50 p-4 rounded-2xl border-3 border-blue-300 leading-relaxed">
+          スマホのキーボードの『あ』を ２回 つづけておしてください
+        </div>
+
+        <div id="realtime-banner" class="bg-amber-100 text-amber-950 p-3.5 rounded-2xl border-2 border-amber-400 font-black text-senior-base flex items-center space-x-2">
+          <span class="text-3xl">💡</span>
+          <span id="realtime-banner-text">したの黄いろい枠をおすと、本もののキーボードが出ます！</span>
+        </div>
+
+        <!-- 本物キーボード立ち上げ用 input -->
+        <div class="space-y-1.5">
+          <label for="real-drill-input" class="block text-senior-base font-black text-slate-800">
+            ↓ ここをおすと キーボードが出ます
+          </label>
+          <input id="real-drill-input" type="text" placeholder="ここをおして文字を入れる" autocomplete="off" class="w-full p-4 border-4 border-amber-400 rounded-2xl bg-amber-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-300 text-senior-xl font-black text-center shadow-inner">
+        </div>
+
+        <!-- 操作補助ボタン -->
+        <div class="flex gap-2">
+          <button onclick="clearDrillInput()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-900 font-black text-senior-base py-3.5 rounded-2xl border-2 border-slate-400 touch-btn flex items-center justify-center space-x-1">
+            <span>🔄</span><span>もういちど</span>
+          </button>
+          <button id="btn-next-tab1" onclick="switchTab('voice')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-senior-base py-3.5 rounded-2xl border-b-4 border-emerald-900 touch-btn hidden flex items-center justify-center space-x-1 shadow-lg">
+            <span>✨ つぎ（② 声で入れる）へ</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 本物キーボード位置ガイド図 (Gboard 特化) -->
+      <div class="bg-slate-800 p-4 rounded-3xl border-4 border-slate-600 text-white shadow-2xl space-y-3">
+        <div class="flex justify-between items-center bg-slate-900 p-3 rounded-2xl border border-slate-700">
+          <span class="text-senior-base font-black text-amber-300 flex items-center space-x-1">
+            <span>📍</span><span>キーボードの おす場所ガイド</span>
+          </span>
+          <span class="bg-amber-400 text-slate-950 text-sm px-3 py-1 rounded-full font-black">
+            位置のず
+          </span>
+        </div>
+
+        <!-- 上部マイク・出てくる言葉バー（専門用語『変換候補』廃止） -->
+        <div id="diag-row-top" class="grid grid-cols-5 gap-1.5 text-center font-black text-sm p-1.5 rounded-xl bg-slate-700">
+          <div id="diag-key-mic" class="bg-slate-600 p-3 rounded-xl flex items-center justify-center text-amber-300 font-black text-base border border-slate-500">
+            🎤 マイク
+          </div>
+          <div id="diag-key-candidate" class="bg-slate-600 p-3 rounded-xl col-span-3 text-amber-200 flex items-center justify-center font-black border border-slate-500 text-senior-base">
+            出てくることば（ここで選ぶ）
+          </div>
+          <div class="bg-slate-600 p-3 rounded-xl text-slate-400 flex items-center justify-center border border-slate-500">⚙️</div>
+        </div>
+
+        <!-- 12キー配置図 -->
+        <div class="grid grid-cols-3 gap-2 text-center font-black text-senior-lg">
+          <div id="diag-key-wa" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            わ <span class="text-xs text-slate-300 font-normal block">ー を ん</span>
+          </div>
+          <div id="diag-key-a" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            あ <span class="text-xs text-slate-300 font-normal block">い う え お</span>
+          </div>
+          <div id="diag-key-ka" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            か <span class="text-xs text-slate-300 font-normal block">き く け こ</span>
+          </div>
+
+          <div id="diag-key-sa" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            さ <span class="text-xs text-slate-300 font-normal block">し す せ そ</span>
+          </div>
+          <div id="diag-key-ta" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            た <span class="text-xs text-slate-300 font-normal block">ち つ て と</span>
+          </div>
+          <div id="diag-key-na" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            な <span class="text-xs text-slate-300 font-normal block">に ぬ ね の</span>
+          </div>
+
+          <div id="diag-key-ha" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            は <span class="text-xs text-slate-300 font-normal block">ひ ふ へ ほ</span>
+          </div>
+          <div id="diag-key-ma" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            ま <span class="text-xs text-slate-300 font-normal block">み む め も</span>
+          </div>
+          <div id="diag-key-ya" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            や <span class="text-xs text-slate-300 font-normal block">ゆ よ</span>
+          </div>
+
+          <div id="diag-key-daku" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            小 ゛ ゜ <span class="text-xs text-slate-300 font-normal block">ちいさい文字/てんてん</span>
+          </div>
+          <div id="diag-key-ra" class="bg-slate-700 p-3 rounded-2xl border border-slate-600">
+            ら <span class="text-xs text-slate-300 font-normal block">り る れ ろ</span>
+          </div>
+          <div id="diag-key-del" class="bg-rose-950 text-rose-200 p-3 rounded-2xl border border-rose-700">
+            ⌫ <span class="text-xs text-rose-300 font-normal block">けす（文字を消す）</span>
+          </div>
+        </div>
+
+        <!-- 最下部機能キー図 -->
+        <div class="grid grid-cols-4 gap-2 text-center font-bold text-xs">
+          <div id="diag-key-mode" class="bg-slate-700 p-2.5 rounded-xl border border-slate-600 text-amber-200">
+            あa1<br><span class="text-[11px] text-slate-300 font-normal">数字や英語</span>
+          </div>
+          <div id="diag-key-space" class="col-span-2 bg-slate-700 p-2.5 rounded-xl border border-slate-600 text-blue-200 text-senior-base flex items-center justify-center font-black">
+            すきま（スペース）
+          </div>
+          <div id="diag-key-enter" class="bg-emerald-900 text-emerald-200 p-2.5 rounded-xl border border-emerald-700 text-senior-base flex items-center justify-center font-black">
+            ↵ けってい / 🔍 さがす
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== タブ② 声で入れる (Chapter 2) ==================== -->
+    <div id="tab-voice" class="tab-page hidden space-y-4">
+      <div class="bg-white p-5 rounded-3xl border-4 border-slate-300 shadow-xl space-y-4">
+        <div class="text-senior-xl font-black text-blue-950 border-b-2 border-blue-200 pb-3 flex items-center space-x-2">
+          <span>🎙️</span>
+          <span>声で文字を入れるれんしゅう</span>
+        </div>
+
+        <!-- マイク位置ガイド -->
+        <div class="bg-amber-50 p-4 rounded-2xl border-3 border-amber-300 space-y-3">
+          <div class="text-senior-lg font-black text-amber-950">💡 キーボードのマイクのばしょ</div>
+          <div class="text-senior-base font-bold text-slate-800 leading-relaxed">
+            文字をうつ画面が出たとき、うえにある <span class="bg-white text-rose-600 px-3 py-1 rounded-xl font-black border-2 border-amber-400 shadow-sm inline-block">🎤 マイクのマーク</span> をおすと、指でうたずに「声だけ」で文字が入ります！
+          </div>
+
+          <!-- ミニ図解 -->
+          <div class="bg-slate-800 text-white p-3.5 rounded-2xl flex justify-between items-center border-2 border-slate-600 shadow-inner">
+            <span class="text-senior-base text-slate-300 font-bold">キーボードのいちばん上</span>
+            <span class="bg-rose-600 text-white px-4 py-2 rounded-xl font-black text-senior-base border border-rose-300">
+              🎤 ここをおして はなす！
+            </span>
+          </div>
+        </div>
+
+        <!-- 声で話しかけるボタン実習 -->
+        <div class="bg-blue-50 p-5 rounded-2xl border-3 border-blue-300 text-center space-y-4">
+          <div class="text-senior-lg font-black text-blue-950 leading-snug">
+            したの青いボタンをおして、スマホに向かって「かなざわの てんき」とはなしてみてください
+          </div>
+
+          <button id="btn-start-voice" onclick="startVoiceRecognition()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-black text-senior-xl py-5 rounded-2xl shadow-xl border-b-4 border-blue-950 flex items-center justify-center space-x-3 touch-btn">
+            <span class="text-4xl">🎤</span>
+            <span>ボタンをおして はなす</span>
+          </button>
+
+          <!-- 音声受信用フォーム -->
+          <div class="space-y-1 text-left">
+            <label for="voice-real-input" class="block text-senior-base font-bold text-slate-700">
+              ↓ ききとった言葉が ここに入ります
+            </label>
+            <input id="voice-real-input" type="text" placeholder="ここに声で文字が入ります" class="w-full p-4 border-4 border-blue-400 rounded-2xl bg-white focus:outline-none shadow-inner text-center font-black text-senior-xl">
+          </div>
+        </div>
+
+        <!-- 次へ誘導ボタン -->
+        <button id="btn-next-tab2" onclick="switchTab('search')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-senior-lg py-4 rounded-2xl border-b-4 border-emerald-900 touch-btn hidden shadow-xl flex items-center justify-center space-x-2">
+          <span>✨ つぎ（③ もじで探す）へ進む</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== タブ③ もじで探す (Chapter 3 - 模擬ボタン完全排除・100%本物キーボード連動) ==================== -->
+    <div id="tab-search" class="tab-page hidden space-y-4">
+
+      <!-- MODE TOGGLE HEADER -->
+      <div class="bg-slate-800 p-2.5 rounded-2xl border-2 border-slate-600 text-white flex items-center justify-between">
+        <span class="text-senior-base font-black text-amber-300 flex items-center space-x-1">
+          <span>🔍</span><span>文字でさがすれんしゅう</span>
+        </span>
+        <div class="flex space-x-1">
+          <button id="mode-btn-drill" onclick="switchSearchSubMode('drill')" class="px-3.5 py-2 rounded-xl font-black text-senior-base bg-amber-400 text-slate-950 shadow">
+            ① キーボードで入力
+          </button>
+          <button id="mode-btn-test" onclick="switchSearchSubMode('test')" class="px-3.5 py-2 rounded-xl font-black text-senior-base bg-slate-700 text-slate-300 hover:bg-slate-600">
+            ② 結果の見わけ方
+          </button>
+        </div>
+      </div>
+
+      <!-- SEARCH DRILL AREA (100% REAL KEYBOARD連動 - 模擬入力ボタン完全全廃) -->
+      <div id="search-submode-drill" class="space-y-4">
+
+        <!-- Step Indicator Pill Bar -->
+        <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-300 shadow-sm flex items-center justify-between">
+          <span id="drill-step-badge" class="bg-blue-700 text-white font-black text-senior-base px-4 py-1.5 rounded-full shadow">
+            じゅんじょ 1 / 6
+          </span>
+          <span id="drill-step-title" class="font-black text-slate-900 text-senior-lg">
+            枠をおして「かなざわ」と打つ
+          </span>
+        </div>
+
+        <!-- 100% REAL INPUT SEARCH BOX (NO DUMMY BUTTONS AT ALL) -->
+        <div id="search-sim-card" class="bg-white p-5 rounded-3xl border-4 border-blue-500 shadow-xl space-y-4">
+          <div class="text-senior-base font-black text-blue-900">📱 さがす枠（Google検索バー）</div>
+          
+          <form onsubmit="handleSearchFormSubmit(event)">
+            <div class="relative flex items-center">
+              <input id="real-search-input" type="text" autocomplete="off" placeholder="ここをおしてキーボードを出す" class="w-full p-4 pr-12 border-4 border-blue-500 rounded-2xl bg-blue-50 focus:bg-white text-senior-xl font-black text-slate-900 shadow-inner focus:outline-none focus:ring-4 focus:ring-blue-300">
+              <span class="absolute right-4 text-3xl">🔍</span>
+            </div>
+          </form>
+
+          <div id="real-search-guide" class="bg-amber-100 text-amber-950 p-4 rounded-2xl border-2 border-amber-400 font-black text-senior-lg text-center leading-relaxed">
+            👆 上の「さがす枠」をおして、自分のキーボードで「かなざわ」と打ってみてください！
+          </div>
+        </div>
+
+        <!-- Gboard Real Keyboard Physical Diagram Guide (Highlighting real key positions) -->
+        <div class="bg-slate-800 p-4 rounded-3xl border-4 border-slate-600 text-white space-y-3 shadow-2xl">
+          <div class="text-senior-base font-black text-amber-300 border-b border-slate-700 pb-2 flex justify-between items-center">
+            <span>📍 いま おす場所のガイド（キーボード図）</span>
+            <span class="bg-amber-400 text-slate-950 text-xs px-2 py-0.5 rounded font-black">Gboard図解</span>
+          </div>
+
+          <!-- Top Candidate Bar Guide -->
+          <div id="diag-search-candidate" class="bg-slate-700 p-3 rounded-xl text-center border border-slate-500 transition">
+            <span class="text-xs text-slate-300 block font-bold">キーボードのすぐ上</span>
+            <span class="text-senior-lg font-black text-amber-300">【 出てくることば（ここで選ぶ） 】</span>
+          </div>
+
+          <!-- Main 12-key Grid Guide -->
+          <div id="diag-search-keys" class="bg-slate-700 p-3 rounded-xl text-center border border-slate-500 transition">
+            <span class="text-xs text-slate-300 block font-bold">キーボードの中央</span>
+            <span class="text-senior-lg font-black text-white">【 あ か さ た な ... （ひらがな） 】</span>
+          </div>
+
+          <!-- Bottom Action Row Guide (Space & Enter) -->
+          <div class="grid grid-cols-3 gap-2">
+            <div id="diag-search-space" class="col-span-2 bg-slate-700 p-3 rounded-xl text-center border border-slate-500 transition">
+              <span class="text-xs text-slate-300 block font-bold">一番下の真ん中（長いボタン）</span>
+              <span class="text-senior-base font-black text-blue-200">すきま（スペース）</span>
+            </div>
+            <div id="diag-search-enter" class="bg-slate-700 p-3 rounded-xl text-center border border-slate-500 transition">
+              <span class="text-xs text-slate-300 block font-bold">右下のボタン</span>
+              <span class="text-senior-base font-black text-emerald-200">↵ / 🔍 けってい</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reset Button -->
+        <button onclick="resetRealSearchDrill()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-senior-base py-3.5 rounded-2xl border-2 border-slate-500 text-center shadow">
+          🔄 手順1から もういちど練習する
+        </button>
+
+      </div>
+
+      <!-- SEARCH TEST AREA (REALISTIC GOOGLE SEARCH RESULTS: AD VS SAFE) -->
+      <div id="search-submode-test" class="hidden space-y-4">
+        
+        <div class="bg-amber-100 text-amber-950 p-4 rounded-3xl border-3 border-amber-400 font-black text-senior-base shadow-md space-y-1">
+          <div class="text-senior-lg font-black text-amber-900">🔍 本ものの結果の見わけ方</div>
+          <p class="text-senior-base font-bold text-slate-800 leading-relaxed">
+            ２つの表示があります。<span class="text-blue-900 underline font-black">【安全なほんものの天気予報】</span>を指でおしてください。
+          </p>
+        </div>
+
+        <!-- Realistic Simulated Google Results Window (NO SEARCH INPUT BAR) -->
+        <div class="bg-slate-100 p-3.5 rounded-3xl border-4 border-slate-300 space-y-3 shadow-2xl">
+          <div class="bg-white p-3 rounded-2xl border border-slate-300 flex items-center justify-between text-slate-800 shadow-sm">
+            <span class="font-black text-blue-600 text-xl">Google 検索結果</span>
+            <span class="text-senior-base font-black text-slate-700 bg-slate-100 px-3.5 py-1 rounded-full border border-slate-300">金沢 天気</span>
+          </div>
+
+          <!-- Realistic Option 1: Ad / Sponsor -->
+          <div onclick="clickAdResultTest()" class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-md space-y-2 cursor-pointer active:bg-slate-50 transition touch-btn">
+            <div class="flex items-center space-x-2 text-xs text-slate-600">
+              <span class="font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border">スポンサー（お店の こうこく）</span>
+              <span>•</span>
+              <span class="text-slate-500 truncate">https://www.example-app-weather.net</span>
+            </div>
+            <div class="text-blue-700 font-black text-senior-lg underline leading-snug">
+              かんたん天気アプリ無料ダウンロード - 雨雲レーダー＆天気通知
+            </div>
+            <p class="text-senior-base text-slate-600 font-normal leading-relaxed">
+              最新の天気予報をお届け！今すぐダウンロードボタンをおしてご利用ください。
+            </p>
+          </div>
+
+          <!-- Realistic Option 2: Safe Official Result -->
+          <div onclick="clickSafeResultTest()" class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-md space-y-2 cursor-pointer active:bg-slate-50 transition touch-btn">
+            <div class="flex items-center space-x-2 text-xs text-slate-600">
+              <span class="font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border">気象庁（公的機関・ほんもの）</span>
+              <span>•</span>
+              <span class="text-slate-500 truncate">https://www.jma.go.jp › jma › kisou</span>
+            </div>
+            <div class="text-blue-700 font-black text-senior-lg underline leading-snug">
+              気象庁 | 石川県金沢市の天気予報
+            </div>
+            <p class="text-senior-base text-slate-600 font-normal leading-relaxed">
+              石川県金沢市の今日・明日の天気予報、週間天気、気温、降水確率をお伝えしています。
+            </p>
+          </div>
+        </div>
+
+        <!-- Next Step Button -->
+        <button id="btn-next-tab3" onclick="switchTab('lens')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-senior-lg py-4 rounded-2xl border-b-4 border-emerald-900 touch-btn hidden shadow-xl flex items-center justify-center space-x-2">
+          <span>✨ つぎ（④ 写真で探す）へ進む</span>
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== タブ④ 写真で探す (Chapter 4 - Google Lens) ==================== -->
+    <div id="tab-lens" class="tab-page hidden space-y-4">
+
+      <div class="bg-white p-5 rounded-3xl border-4 border-slate-300 shadow-xl space-y-4">
+        <div class="text-senior-xl font-black text-emerald-950 border-b-2 border-emerald-200 pb-3 flex items-center space-x-2">
+          <span>📷</span>
+          <span>Googleレンズ（写真で探す）</span>
+        </div>
+
+        <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-300 text-slate-900 text-senior-base font-bold leading-relaxed">
+          道ばたで見かけた花の名前を知りたいとき、検索バーの <span class="bg-white text-blue-600 px-3 py-1 rounded-lg border border-amber-400 font-black shadow-sm">📷 カメラのマーク</span> をおしてお花にカメラを向けるだけで名前がわかります！
+        </div>
+
+        <!-- Step 1: Simulated Google Widget Bar -->
+        <div id="lens-flow-step1" class="bg-slate-900 p-4 rounded-3xl border-4 border-slate-700 space-y-3 text-white shadow-2xl">
+          <div class="text-senior-base font-black text-amber-300">手順①：検索バーの 📷 ボタンをおす</div>
+
+          <div class="bg-white text-slate-800 p-3.5 rounded-full border-4 border-amber-300 flex items-center justify-between shadow-lg">
+            <div class="flex items-center space-x-2 pl-2">
+              <span class="font-black text-blue-600 text-3xl">G</span>
+              <span class="text-slate-400 font-bold text-senior-base">検索する言葉を入れる</span>
+            </div>
+            <div class="flex items-center space-x-2 pr-1">
+              <span class="text-2xl">🎙️</span>
+              <button onclick="startLensCameraSimulation()" class="bg-amber-400 hover:bg-amber-500 p-3 rounded-full animate-bounce text-3xl border-2 border-amber-600 shadow-xl active:scale-90 transition cursor-pointer">
+                📷
+              </button>
+            </div>
+          </div>
+          <div class="text-center text-senior-base text-amber-200 font-black">
+            👆 点滅している 📷 カメラボタンをおしてカメラを開く！
+          </div>
+        </div>
+
+        <!-- Step 2: Camera Viewfinder with Focus Box & Shutter -->
+        <div id="lens-flow-step2" class="hidden bg-slate-950 p-4 rounded-3xl border-4 border-slate-700 space-y-4 text-white shadow-2xl relative overflow-hidden">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <span class="text-senior-base font-black text-amber-300">手順②：お花を枠にあわせて ⚪ をおす</span>
+            <span class="bg-amber-400 text-slate-950 text-xs px-2.5 py-1 rounded-full font-black">Googleレンズ カメラ画面</span>
+          </div>
+
+          <!-- Camera Viewfinder View (Dandelion flower SVG) -->
+          <div class="relative bg-slate-900 border-4 border-slate-700 rounded-2xl h-72 overflow-hidden flex flex-col justify-between p-3 shadow-inner">
+            
+            <!-- Scanning Line -->
+            <div id="lens-scan-line-anim" class="hidden scan-line z-20"></div>
+
+            <!-- Yellow Framing Box in Center -->
+            <div class="absolute inset-6 border-4 border-dashed border-amber-300/90 rounded-2xl pointer-events-none z-10 flex flex-col justify-between p-2 shadow-2xl">
+              <div class="text-senior-base text-amber-200 font-black bg-slate-900/80 px-3 py-1 rounded-full border border-amber-400 w-max mx-auto shadow">
+                枠の中にお花をあわせます
+              </div>
+            </div>
+
+            <!-- Subject Flower Rendering (SVG Dandelion) -->
+            <div class="flex-1 flex items-center justify-center relative z-0">
+              <svg class="w-48 h-48 drop-shadow-2xl" viewBox="0 0 100 100">
+                <path d="M 50 50 Q 48 75 45 95" stroke="#16a34a" stroke-width="4" fill="none"/>
+                <path d="M 46 80 Q 25 70 20 85 Q 35 90 47 88" fill="#15803d"/>
+                <path d="M 48 75 Q 70 65 78 80 Q 60 85 47 82" fill="#15803d"/>
+                <g fill="#facc15" stroke="#eab308" stroke-width="0.5">
+                  <circle cx="50" cy="40" r="28" />
+                  <circle cx="50" cy="40" r="22" fill="#fef08a" />
+                  <circle cx="50" cy="40" r="14" fill="#fde047" />
+                  <circle cx="50" cy="40" r="8" fill="#ca8a04" />
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- White Circular Shutter Button -->
+          <div class="flex flex-col items-center justify-center space-y-2 pt-1">
+            <button onclick="triggerLensShutterAction()" class="w-20 h-20 bg-white hover:bg-slate-100 rounded-full border-8 border-amber-400 shadow-2xl active:scale-90 transition flex items-center justify-center touch-btn">
+              <span class="w-12 h-12 rounded-full border-2 border-slate-300 bg-slate-100"></span>
+            </button>
+            <span class="text-senior-base font-black text-amber-300">⚪ 白い丸をおして写真をとる</span>
+          </div>
+        </div>
+
+        <!-- Step 3: Lens Result Sheet with Sponsor vs Real Flower Selection -->
+        <div id="lens-flow-step4" class="hidden space-y-3">
+          <div class="bg-amber-50 text-slate-900 p-5 rounded-3xl border-4 border-amber-400 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b-2 border-amber-300 pb-2">
+              <span class="text-xs bg-emerald-700 text-white font-black px-3 py-1 rounded-full">Googleレンズ 検索結果</span>
+              <span class="text-xs font-black text-amber-900">✨ お散歩図鑑</span>
+            </div>
+
+            <div class="bg-rose-100 text-rose-950 p-3.5 rounded-2xl border-2 border-rose-300 font-black text-senior-base">
+              ⚠️ いちばん上にある「スポンサー（こうこく）」はおさずに、画面を下にすべらせて「ほんもののお花の説明」をおしてください！
+            </div>
+
+            <!-- Sponsor Card in Lens Results -->
+            <div onclick="clickLensSponsorAd()" class="bg-white p-4 rounded-2xl border-2 border-slate-300 shadow-md space-y-1 cursor-pointer active:bg-slate-100 transition">
+              <div class="text-xs font-black text-slate-600 bg-slate-100 px-2 py-0.5 rounded w-max border">
+                スポンサー（こうこく）
+              </div>
+              <div class="text-senior-lg font-black text-blue-800 underline">
+                タンポポの鉢植え通販ショップはこちら！
+              </div>
+              <p class="text-sm font-normal text-slate-600">
+                健康に良いタンポポ茶や苗木を今すぐご注文いただけます。
+              </p>
+            </div>
+
+            <!-- Real Botanical Result Card -->
+            <div onclick="clickLensRealFlower()" class="bg-emerald-100 p-4 rounded-2xl border-4 border-emerald-500 shadow-lg space-y-2 cursor-pointer active:bg-emerald-200 transition">
+              <div class="text-xs font-black text-emerald-900 bg-emerald-200 px-2 py-0.5 rounded w-max border border-emerald-400">
+                🌸 ほんもののお花の説明（植物図鑑）
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="text-5xl bg-emerald-200 p-2 rounded-2xl border border-emerald-400 flex-shrink-0">🌼</div>
+                <div>
+                  <div class="text-senior-xl font-black text-slate-950">セイヨウタンポポ</div>
+                  <div class="text-senior-base font-black text-emerald-900">春にさく 黄いろいお花</div>
+                </div>
+              </div>
+              <p class="text-senior-base font-bold text-slate-800 leading-relaxed bg-white p-3 rounded-xl border border-emerald-300">
+                道ばたや公園によく咲いている黄色いお花です。花がおわると、丸い「わたげ」になります。
+              </p>
+            </div>
+          </div>
+
+          <button onclick="resetLensFlow()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-senior-base py-3.5 rounded-2xl border-2 border-slate-600 text-center shadow">
+            🔄 もう一度写真をとる練習をする
+          </button>
+        </div>
+
+        <!-- 次へ誘導ボタン -->
+        <button id="btn-next-tab4" onclick="switchTab('security')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-senior-lg py-4 rounded-2xl border-b-4 border-emerald-900 touch-btn hidden shadow-xl flex items-center justify-center space-x-2">
+          <span>✨ つぎ（⑤ あぶない！防犯テスト）へ進む</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ==================== タブ⑤ あぶない！ (Chapter 5 - Anti-Scam) ==================== -->
+    <div id="tab-security" class="tab-page hidden space-y-4">
+      <div id="quiz-main-card" class="bg-white p-5 rounded-3xl border-4 border-slate-300 shadow-xl space-y-4">
+
+        <!-- 進捗ヘッダー -->
+        <div class="flex justify-between items-center bg-rose-100 text-rose-950 p-4 rounded-2xl border-2 border-rose-300">
+          <span class="text-senior-lg font-black">🛡️ 防犯パトロール</span>
+          <span id="quiz-progress-badge" class="text-senior-lg font-black bg-white px-4 py-1 rounded-full border-2 border-rose-400 shadow-sm">
+            第 1 / 5 問
+          </span>
+        </div>
+
+        <!-- クイズ表示エリア -->
+        <div id="quiz-content-area" class="space-y-4">
+          <div id="quiz-title-text" class="text-senior-xl font-black text-slate-900 leading-snug">
+            タイトル
+          </div>
+
+          <!-- 模擬受信メッセージ画面 -->
+          <div class="bg-slate-900 text-emerald-400 p-4 rounded-2xl font-mono space-y-2 border-4 border-slate-700 shadow-inner">
+            <div id="quiz-sender-text" class="text-xs text-slate-400 border-b border-slate-700 pb-1 font-bold">送ってきた相手: XXX</div>
+            <div id="quiz-message-body" class="text-senior-lg text-white font-black leading-relaxed">
+              メッセージ内容
+            </div>
+          </div>
+
+          <div class="text-senior-lg font-black text-slate-900 pt-1">
+            ❓ どうするのが 一番安全ですか？
+          </div>
+
+          <!-- 選択肢ボタン群 -->
+          <div id="quiz-options-box" class="space-y-3">
+            <!-- JSで動的生成 -->
+          </div>
+        </div>
+
+        <!-- 全5問クリア時 金賞 スマホあんしん認定証 -->
+        <div id="certificate-box" class="hidden text-center space-y-5 bg-amber-50 p-6 rounded-3xl border-8 border-amber-400 shadow-2xl">
+          <div class="text-7xl animate-bounce">🏅</div>
+          <div class="text-senior-xl font-black text-amber-950 tracking-wide">金賞 スマホあんしん認定証</div>
+
+          <div class="bg-white p-5 rounded-2xl border-4 border-amber-300 shadow-inner space-y-3 text-left">
+            <div class="space-y-1">
+              <label for="cert-user-name" class="block text-senior-base font-black text-slate-700">お名前を入れてください：</label>
+              <input id="cert-user-name" type="text" value="あんしんスマホ名人" class="w-full p-3 border-2 border-amber-400 rounded-xl font-black text-senior-lg text-slate-900 bg-amber-50 text-center">
+            </div>
+            <div class="text-senior-base font-black text-slate-900">認定番号：NO. S-2026-999</div>
+            <div id="cert-date-display" class="text-senior-base font-bold text-slate-700">認定日：2026年9月</div>
+            <p class="text-senior-base font-bold text-slate-800 leading-relaxed pt-2 border-t border-slate-200">
+              あなたはいろいろな詐欺（さぎ）を見抜く素晴らしい知識を身につけ、「あんしんスマホ名人」として認定されました！
+            </p>
+          </div>
+
+          <div class="bg-amber-200 text-amber-950 p-4 rounded-2xl font-black text-senior-base border-2 border-amber-400">
+            「あわてさせる連絡は ボタンをおさない・家族や警察にそうだん」を忘れずに！
+          </div>
+
+          <button onclick="resetSecurityQuiz()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-senior-lg py-4 rounded-2xl shadow-xl border-b-4 border-amber-700 touch-btn">
+            🔄 もう一度防犯パトロールをする
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 画面内カスタムメッセージモーダル（ブラウザ標準alert排除） -->
+  <div id="custom-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl border-4 border-amber-400 max-w-md w-full p-6 space-y-4 shadow-2xl text-center">
+      <div id="modal-icon" class="text-7xl">🦉</div>
+      <div id="modal-title" class="text-senior-xl font-black text-slate-900">フク先生のおしらせ</div>
+      <div id="modal-body" class="text-senior-lg font-bold text-slate-800 whitespace-pre-line leading-relaxed">
+        メッセージ内容
+      </div>
+      <button onclick="closeCustomModal()" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-senior-lg py-4 rounded-2xl shadow-lg border-b-4 border-amber-600 touch-btn">
+        わかりました！
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function playTone(type) {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'tap') {
+          osc.frequency.setValueAtTime(440, ctx.currentTime);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.06);
+        } else if (type === 'success') {
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08);
+          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        } else if (type === 'warn') {
+          osc.frequency.setValueAtTime(220, ctx.currentTime);
+          osc.frequency.setValueAtTime(180, ctx.currentTime + 0.12);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.25);
+        }
+      } catch(e) {}
+    }
+
+    // --- アプリ基本状態 ---
+    let totalScore = 0;
+    let activeTab = 'input';
+    let keyboardMode = 'toggle'; // 'toggle' | 'flick'
+    let currentStep = 1;
+
+    function addScore(pts) {
+      totalScore += pts;
+      document.getElementById('score-display').innerText = totalScore;
+    }
+
+    // --- カスタムモーダルダイアログ表示 (Fuku-sensei) ---
+    function showModal(title, bodyText, icon = '🦉') {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-body').innerText = bodyText;
+      document.getElementById('modal-icon').innerText = icon;
+      document.getElementById('custom-modal').classList.remove('hidden');
+    }
+
+    function closeCustomModal() {
+      playTone('tap');
+      document.getElementById('custom-modal').classList.add('hidden');
+    }
+
+    function switchTab(tabId) {
+      playTone('tap');
+      activeTab = tabId;
+
+      document.querySelectorAll('.tab-page').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+      ['input', 'voice', 'search', 'lens', 'security'].forEach(t => {
+        const btn = document.getElementById(`nav-btn-${t}`);
+        if (t === tabId) {
+          btn.className = "py-2.5 px-0.5 rounded-xl flex flex-col items-center justify-center font-black transition bg-amber-400 text-slate-950 border-2 border-amber-500 shadow-md min-h-[64px]";
+        } else {
+          btn.className = "py-2.5 px-0.5 rounded-xl flex flex-col items-center justify-center font-black transition text-slate-300 hover:bg-slate-700 min-h-[64px]";
+        }
+      });
+
+      const fuku = document.getElementById('fuku-message');
+      if (tabId === 'input') fuku.innerText = "したの『おす場所ガイド』を見ながら、本もののキーボードで文字を入れてみましょう！";
+      if (tabId === 'voice') fuku.innerText = "キーボードのマイクマーク か、画面の青いボタンをおして話してみましょう！";
+      if (tabId === 'search') fuku.innerText = "画面上のボタンはありません！自分のキーボードだけを使って検索してみましょう！";
+      if (tabId === 'lens') fuku.innerText = "Googleのカメラボタンをおして、お花を撮影するコツを練習しましょう！";
+      if (tabId === 'security') fuku.innerText = "怪しい詐欺（さぎ）を見抜く防犯パトロールに出発です！";
+
+      if (tabId === 'input') updateStepView();
+      if (tabId === 'search') updateRealSearchDrillUI();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- 位置ガイド図のキー強調表示 ---
+    function clearDiagramHighlights() {
+      document.querySelectorAll('#diag-row-top div, #tab-input .grid div').forEach(el => {
+        el.classList.remove('key-target-active');
+      });
+    }
+
+    function highlightDiagramKeys(keyIds) {
+      clearDiagramHighlights();
+      keyIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('key-target-active');
+      });
+    }
+
+    function setKeyboardMode(mode) {
+      playTone('tap');
+      keyboardMode = mode;
+      const btnT = document.getElementById('btn-toggle-mode');
+      const btnF = document.getElementById('btn-flick-mode');
+
+      if (mode === 'toggle') {
+        btnT.className = "flex-1 py-3.5 font-black text-senior-base rounded-xl transition bg-amber-400 text-slate-950 shadow-md border-2 border-amber-500";
+        btnF.className = "flex-1 py-3.5 font-black text-senior-base text-slate-300 rounded-xl transition";
+      } else {
+        btnF.className = "flex-1 py-3.5 font-black text-senior-base rounded-xl transition bg-amber-400 text-slate-950 shadow-md border-2 border-amber-500";
+        btnT.className = "flex-1 py-3.5 font-black text-senior-base text-slate-300 rounded-xl transition";
+      }
+      updateStepView();
+    }
+
+    const stepConfigs = {
+      1: {
+        title: "「い」を入れてみよう",
+        instructionToggle: "キーボードの『あ』を ２回 つづけておしてください",
+        instructionFlick: "キーボードの『あ』を指でおして【ひだりに すべらせて】ください",
+        highlightKeys: ["diag-key-a"],
+        prefill: ""
+      },
+      2: {
+        title: "ちいさい「ょ」を入れてみよう",
+        instructionToggle: "『や』を ３回おして『よ』にしたあと、ひだり下の【小 ゛ ゜】をおしてください",
+        instructionFlick: "『や』を 下にすべらせて『よ』にし、ひだり下の【小 ゛ ゜】をおしてください",
+        highlightKeys: ["diag-key-ya", "diag-key-daku"],
+        prefill: ""
+      },
+      3: {
+        title: "のばす音「ー」を入れてみよう",
+        instructionToggle: "『わ』を ５回おすか、うえに出てくる言葉から『ー』をえらんでください",
+        instructionFlick: "『わ』を 上にすべらせるか、うえに出てくる言葉から『ー』をえらんでください",
+        highlightKeys: ["diag-key-wa"],
+        prefill: ""
+      },
+      4: {
+        title: "数字の「1」を入れてみよう",
+        instructionToggle: "ひだり下の【あa1】をおして数字にしてから、『1』をおしてください",
+        instructionFlick: "ひだり下の【あa1】をおして数字にしてから、『1』をおしてください",
+        highlightKeys: ["diag-key-mode"],
+        prefill: ""
+      },
+      5: {
+        title: "まちがえた文字を「けす」れんしゅう",
+        instructionToggle: "入っている『あかき』のうち、みぎ上の【⌫】（けすマーク）で『き』を消してください",
+        instructionFlick: "入っている『あかき』のうち、みぎ上の【⌫】（けすマーク）で『き』を消してください",
+        highlightKeys: ["diag-key-del"],
+        prefill: "あかき"
+      }
+    };
+
+    function updateStepView() {
+      const config = stepConfigs[currentStep];
+      const realInput = document.getElementById('real-drill-input');
+      const banner = document.getElementById('realtime-banner-text');
+      const btnNext = document.getElementById('btn-next-tab1');
+
+      if (!config) {
+        document.getElementById('step-number-tag').innerText = "🎉 ぜんぶできました！";
+        document.getElementById('step-title-text').innerText = "おめでとうございます！";
+        document.getElementById('step-instruction').innerText = "スマホのキーボード操作が とても上手にできました！";
+        banner.innerText = "⭕ すべての文字練習をクリアしました！";
+        realInput.value = "🎯 かんぺき！";
+        clearDiagramHighlights();
+        btnNext.classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('step-number-tag').innerText = `じゅんじょ ${currentStep} / 5`;
+      document.getElementById('step-title-text').innerText = config.title;
+      document.getElementById('step-instruction').innerText = keyboardMode === 'toggle' ? config.instructionToggle : config.instructionFlick;
+
+      if (config.prefill && realInput.value === "") {
+        realInput.value = config.prefill;
+      } else if (!config.prefill && (currentStep >= 1 && currentStep <= 4)) {
+        realInput.value = "";
+      }
+
+      banner.innerText = "したの黄いろい枠をおして、ガイドの場所にあるボタンをおしてください！";
+      btnNext.classList.add('hidden');
+      highlightDiagramKeys(config.highlightKeys);
+    }
+
+    function clearDrillInput() {
+      playTone('tap');
+      const realInput = document.getElementById('real-drill-input');
+      const config = stepConfigs[currentStep];
+      if (config) {
+        realInput.value = config.prefill || "";
+      } else {
+        realInput.value = "";
+      }
+      updateStepView();
+    }
+
+    document.getElementById('real-drill-input').addEventListener('input', function(e) {
+      const val = e.target.value;
+      const banner = document.getElementById('realtime-banner-text');
+
+      if (currentStep === 1) {
+        if (val.includes("あ")) banner.innerText = "「あ」が入りました！もう１回「あ」をおして「い」にしてください！";
+        if (val.includes("い")) {
+          playTone('success');
+          addScore(20);
+          banner.innerText = "⭕ 大正解！「い」が入りました！";
+          showModal("⭕ 大成功！", "「い」を入力できました！\nつぎへ進みましょう！");
+          currentStep++;
+          document.getElementById('real-drill-input').value = "";
+          updateStepView();
+        }
+      } else if (currentStep === 2) {
+        if (val.includes("や") || val.includes("よ")) banner.innerText = "『よ』になりました！ひだり下の【小 ゛ ゜】をおして『ょ』にしてください！";
+        if (val.includes("ょ")) {
+          playTone('success');
+          addScore(20);
+          banner.innerText = "⭕ 大正解！ちいさい「ょ」が入りました！";
+          showModal("⭕ 大成功！", "ちいさい「ょ」を入力できました！");
+          currentStep++;
+          document.getElementById('real-drill-input').value = "";
+          updateStepView();
+        }
+      } else if (currentStep === 3) {
+        if (val.includes("ー")) {
+          playTone('success');
+          addScore(20);
+          banner.innerText = "⭕ 大正解！のばす音「ー」が入りました！";
+          showModal("⭕ 大成功！", "のばす音「ー」を入力できました！");
+          currentStep++;
+          document.getElementById('real-drill-input').value = "";
+          updateStepView();
+        }
+      } else if (currentStep === 4) {
+        if (val.includes("1")) {
+          playTone('success');
+          addScore(20);
+          banner.innerText = "⭕ 大正解！数字の「1」が入りました！";
+          showModal("⭕ 大成功！", "数字の「1」を入れられました！");
+          currentStep++;
+          document.getElementById('real-drill-input').value = "あかき";
+          updateStepView();
+        }
+      } else if (currentStep === 5) {
+        if (val === "あか") {
+          playTone('success');
+          addScore(30);
+          banner.innerText = "⭕ 大正解！【⌫】で「き」を消せました！";
+          showModal("🎉 文字練習クリア！", "文字を消す【⌫】マークをマスターしました！\n「② 声で入れる」に進みましょう！");
+          currentStep++;
+          updateStepView();
+        } else if (val.length < 3) {
+          banner.innerText = "『き』が消えました！『あか』の状態でバッチリです！";
+        }
+      }
+    });
+
+    // --- ② 声で入れる（音声入力）ロジック ---
+    function startVoiceRecognition() {
+      playTone('tap');
+      const voiceInput = document.getElementById('voice-real-input');
+      const btnNext = document.getElementById('btn-next-tab2');
+
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showModal("おしらせ", "キーボードの上にある 🎤 マイクのマークをおすと、声で文字を入れることができます！");
+        voiceInput.value = "かなざわの てんき";
+        addScore(20);
+        btnNext.classList.remove('hidden');
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const rec = new SpeechRecognition();
+      rec.lang = 'ja-JP';
+
+      showModal("🎤 声をお聞かせください", "スマホに向かって「かなざわの てんき」とはっきりお話しください！", "🎙️");
+
+      rec.onresult = function(e) {
+        const text = e.results[0][0].transcript;
+        playTone('success');
+        voiceInput.value = text;
+        addScore(20);
+        btnNext.classList.remove('hidden');
+        showModal("🎉 声で入りました！", `聞きとった言葉：\n『${text}』\n\n文字を打たずに声だけで入れられました！\n「③ もじで探す」へ進みましょう！`);
+      };
+
+      rec.onerror = function() {
+        playTone('warn');
+        voiceInput.value = "かなざわの てんき";
+        btnNext.classList.remove('hidden');
+        showModal("おしらせ", "声で「かなざわの てんき」と入れる練習ができました！");
+      };
+
+      rec.start();
+    }
+
+    // --- ③ もじで探す (100% 本物キーボード リアルタイム段階検知ロジック) ---
+    let realSearchStep = 1;
+
+    function switchSearchSubMode(mode) {
+      playTone('tap');
+      const btnDrill = document.getElementById('mode-btn-drill');
+      const btnTest = document.getElementById('mode-btn-test');
+
+      if (mode === 'drill') {
+        document.getElementById('search-submode-drill').classList.remove('hidden');
+        document.getElementById('search-submode-test').classList.add('hidden');
+        btnDrill.className = "px-3.5 py-2 rounded-xl font-black text-senior-base bg-amber-400 text-slate-950 shadow";
+        btnTest.className = "px-3.5 py-2 rounded-xl font-black text-senior-base bg-slate-700 text-slate-300 hover:bg-slate-600";
+      } else {
+        document.getElementById('search-submode-drill').classList.add('hidden');
+        document.getElementById('search-submode-test').classList.remove('hidden');
+        btnTest.className = "px-3.5 py-2 rounded-xl font-black text-senior-base bg-amber-400 text-slate-950 shadow";
+        btnDrill.className = "px-3.5 py-2 rounded-xl font-black text-senior-base bg-slate-700 text-slate-300 hover:bg-slate-600";
+      }
+    }
+
+    const realSearchStepGuides = {
+      1: {
+        badge: "じゅんじょ 1 / 6",
+        title: "枠をおして「かなざわ」と打つ",
+        guide: "① 上の枠をタップして、キーボードで『かなざわ』と打ってください",
+        highlightDiag: "diag-search-keys"
+      },
+      2: {
+        badge: "じゅんじょ 2 / 6",
+        title: "候補バーの「金沢」を押す",
+        guide: "② キーボードのすぐ上に出ている『出てくることば』から『金沢』を押してください",
+        highlightDiag: "diag-search-candidate"
+      },
+      3: {
+        badge: "じゅんじょ 3 / 6",
+        title: "「すきま（スペース）」を押す",
+        guide: "③ キーボードの一番下にある長方形の『すきま（スペース）』キーを1回押してください",
+        highlightDiag: "diag-search-space"
+      },
+      4: {
+        badge: "じゅんじょ 4 / 6",
+        title: "「てんき」と打つ",
+        guide: "④ キーボードで『てんき』と打ってください",
+        highlightDiag: "diag-search-keys"
+      },
+      5: {
+        badge: "じゅんじょ 5 / 6",
+        title: "候補バーの「天気」を押す",
+        guide: "⑤ キーボードのすぐ上に出ている『出てくることば』から『天気』を押してください",
+        highlightDiag: "diag-search-candidate"
+      },
+      6: {
+        badge: "じゅんじょ 6 / 6",
+        title: "右下の「けってい（↵）」または「検索（🔍）」を押す",
+        guide: "⑥ キーボードの右下にある『けってい（↵）』や『検索（🔍）』を押して検索を完了してください！",
+        highlightDiag: "diag-search-enter"
+      }
+    };
+
+    function updateRealSearchDrillUI() {
+      const badge = document.getElementById('drill-step-badge');
+      const title = document.getElementById('drill-step-title');
+      const guide = document.getElementById('real-search-guide');
+
+      const info = realSearchStepGuides[realSearchStep];
+      if (info) {
+        badge.innerText = info.badge;
+        title.innerText = info.title;
+        guide.innerText = info.guide;
+
+        // Reset Diagram Highlights
+        ['diag-search-candidate', 'diag-search-keys', 'diag-search-space', 'diag-search-enter'].forEach(id => {
+          document.getElementById(id).classList.remove('key-target-active');
+        });
+        if (info.highlightDiag) {
+          document.getElementById(info.highlightDiag).classList.add('key-target-active');
+        }
+      }
+    }
+
+    // 本物キーボードのリアルタイム入力イベント検知
+    document.getElementById('real-search-input').addEventListener('input', function(e) {
+      const val = e.target.value;
+
+      if (realSearchStep === 1) {
+        if (val.includes("かなざわ")) {
+          playTone('tap');
+          realSearchStep = 2;
+          updateRealSearchDrillUI();
+        } else if (val.includes("金沢")) {
+          // もし直接変換された場合
+          playTone('tap');
+          realSearchStep = 3;
+          updateRealSearchDrillUI();
+        }
+      } else if (realSearchStep === 2) {
+        if (val.includes("金沢")) {
+          playTone('success');
+          realSearchStep = 3;
+          updateRealSearchDrillUI();
+        }
+      } else if (realSearchStep === 3) {
+        if (val.includes("金沢 ") || val.includes("金沢　")) {
+          playTone('success');
+          realSearchStep = 4;
+          updateRealSearchDrillUI();
+        }
+      } else if (realSearchStep === 4) {
+        if (val.includes("てんき")) {
+          playTone('tap');
+          realSearchStep = 5;
+          updateRealSearchDrillUI();
+        } else if (val.includes("天気")) {
+          playTone('tap');
+          realSearchStep = 6;
+          updateRealSearchDrillUI();
+        }
+      } else if (realSearchStep === 5) {
+        if (val.includes("金沢 天気") || val.includes("金沢　天気")) {
+          playTone('success');
+          realSearchStep = 6;
+          updateRealSearchDrillUI();
+        }
+      }
+    });
+
+    // キーボードのEnter打鍵（検索実行）検知
+    function handleSearchFormSubmit(event) {
+      event.preventDefault();
+      const val = document.getElementById('real-search-input').value;
+
+      if (realSearchStep === 6 || (val.includes("金沢") && val.includes("天気"))) {
+        playTone('success');
+        addScore(40);
+        showModal("🎉 検索完了！", "自分のスマホキーボードだけで「金沢 天気」と正しく検索できました！\nつぎは『検索結果の見分け方』を試してみましょう！");
+        switchSearchSubMode('test');
+      } else {
+        playTone('warn');
+        showModal("💡 あとすこし！", "まずはガイドに従って「金沢 天気」とキーボードで文字を入れてみましょう！");
+      }
+    }
+
+    function resetRealSearchDrill() {
+      playTone('tap');
+      realSearchStep = 1;
+      document.getElementById('real-search-input').value = "";
+      updateRealSearchDrillUI();
+    }
+
+    // --- Safe Search Results Test Logic (Ad vs Safe) ---
+    function clickAdResultTest() {
+      playTone('warn');
+      showModal("⚠️ これは『お店の こうこく』です！", "「スポンサー（こうこく）」と書いてあるものは宣伝です。\nお金がかかるアプリやサービスに案内されてしまうことがあるので、おさないように気をつけましょう！", "🚨");
+    }
+
+    function clickSafeResultTest() {
+      playTone('success');
+      addScore(30);
+      document.getElementById('btn-next-tab3').classList.remove('hidden');
+      showModal("⭕ 大正解！ほんものの情報です！", "「気象庁」のようなほんものの情報をおせました！\n「④ 写真で探す」へ進みましょう！", "✨");
+    }
+
+    // --- ④ 写真で探す (Google Lens Camera Simulation Logic) ---
+    function startLensCameraSimulation() {
+      playTone('tap');
+      document.getElementById('lens-flow-step1').classList.add('hidden');
+      document.getElementById('lens-flow-step2').classList.remove('hidden');
+    }
+
+    function triggerLensShutterAction() {
+      playTone('tap');
+      const scanLine = document.getElementById('lens-scan-line-anim');
+      scanLine.classList.remove('hidden');
+
+      setTimeout(() => {
+        scanLine.classList.add('hidden');
+        playTone('success');
+        addScore(30);
+
+        document.getElementById('lens-flow-step2').classList.add('hidden');
+        document.getElementById('lens-flow-step4').classList.remove('hidden');
+
+        showModal("📷 写真が撮れました！", "お花の名前を調べています。\n画面の一番上にある『こうこく』はおさずに、したにある『ほんもののお花の説明』をおしてください！", "🌼");
+      }, 1500);
+    }
+
+    function clickLensSponsorAd() {
+      playTone('warn');
+      showModal("⚠️ これは『お店の こうこく』です！", "「スポンサー（こうこく）」は宣伝です。\nおさないで、画面を下にスライドして「ほんもののお花の説明」をおしてください！", "🚨");
+    }
+
+    function clickLensRealFlower() {
+      playTone('success');
+      addScore(30);
+      document.getElementById('btn-next-tab4').classList.remove('hidden');
+      showModal("⭕ 大正解！ほんもののお花の説明です！", "こうこくを通り過ぎて「セイヨウタンポポ」のほんもの図鑑をひらくことができました！\n「⑤ あぶない！」へ進みましょう！", "✨");
+    }
+
+    function resetLensFlow() {
+      playTone('tap');
+      document.getElementById('lens-flow-step1').classList.remove('hidden');
+      document.getElementById('lens-flow-step2').classList.add('hidden');
+      document.getElementById('lens-flow-step4').classList.add('hidden');
+    }
+
+    // --- ⑤ あぶない！クイズ (全5問シナリオ - 専門用語なし・シニア向け) ---
+    const fixedQuizList = [
+      {
+        title: "📩 1. 知らない人からの「お金を払え」メール",
+        sender: "送ってきた相手: 090-XXXX-XXXX（知らない番号）",
+        message: "【たいせつ】スマホのお金が払われていません。すぐ下をおしてお金を払ってください。 http://fake-pay-ntt.com",
+        options: [
+          { text: "① 書いてあるボタンをすぐおす", isCorrect: false, exp: "ボタンをおすと、ニセモノの画面でお金を盗まれてしまいます！" },
+          { text: "② おさずに無視して消す", isCorrect: true, exp: "大正解！知らない相手からの「すぐ払え」メールは無視して消すのが一番安全です！" }
+        ]
+      },
+      {
+        title: "🚨 2. 急に出た「ウイルスにかかりました」画面",
+        sender: "警告画面（大きな音が出ます）",
+        message: "⚠️ あぶない！あなたのスマホはウイルスにかかりました！今すぐ電話してください：0120-XXX-XXX",
+        options: [
+          { text: "① 書いてある番号に電話をかける", isCorrect: false, exp: "電話をかけると騙されて、高額なお金を請求されてしまいます！" },
+          { text: "② 電話しないで、画面を閉じる", isCorrect: true, exp: "大正解！これは人をあわてさせる『ニセモノの警告』です。画面を閉じれば大丈夫です！" }
+        ]
+      },
+      {
+        title: "📦 3. 宅配便からの「荷物を届けました」メール",
+        sender: "たくはいびんを名乗るメール",
+        message: "荷物をお届けにあがりましたが留守でした。下をおして再配達をしてください。 http://fake-sagawa.net",
+        options: [
+          { text: "① 書いてあるボタンはおさずに、家族にきく", isCorrect: true, exp: "大正解！あやしいメールのボタンはおさず、家族や本物のお店に確認しましょう！" },
+          { text: "② 書いてあるボタンをすぐおす", isCorrect: false, exp: "ニセモノの画面に案内され、名前やパスワードを盗まれてしまいます！" }
+        ]
+      },
+      {
+        title: "🔑 4. 銀行からの「パスワードを入れてください」",
+        sender: "ぎんこうを名乗るメール",
+        message: "【あぶない】あなたの口座が使われました。すぐ下をおしてパスワードを入れてください。",
+        options: [
+          { text: "① メールの中にあるボタンをおして答える", isCorrect: false, exp: "本物にそっくりな偽サイトでパスワードをとられてしまいます！" },
+          { text: "② ボタンはおさず、銀行の窓口で確認する", isCorrect: true, exp: "大正解！大切なお知らせはメールのボタンからではなく、本物のお店や窓口で確認しましょう。" }
+        ]
+      },
+      {
+        title: "📞 5. 市役所を名乗る「お金を返します」の電話",
+        sender: "電話（市役所の人を名乗る相手）",
+        message: "「市役所です。払いすぎた医療費（お金）を返します。今すぐATM（銀行の機械）にいってください」",
+        options: [
+          { text: "① あわててATMに行ってボタンをおす", isCorrect: false, exp: "ATMでお金が戻ることは絶対にありません！犯人にお金を振込ませる詐欺です。" },
+          { text: "② 電話を切って、警察や家族にそうだんする", isCorrect: true, exp: "大正解！『還付金（かんぷきん）＋ATM』は100%詐欺です。警察や家族にそうだんしましょう！" }
+        ]
+      }
+    ];
+
+    let currentQuizIndex = 0;
+
+    function renderQuizQuestion() {
+      const q = fixedQuizList[currentQuizIndex];
+      document.getElementById('quiz-progress-badge').innerText = `第 ${currentQuizIndex + 1} / 5 問`;
+      document.getElementById('quiz-title-text').innerText = q.title;
+      document.getElementById('quiz-sender-text').innerText = q.sender;
+      document.getElementById('quiz-message-body').innerText = q.message;
+
+      const box = document.getElementById('quiz-options-box');
+      box.innerHTML = '';
+
+      q.options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full p-4 rounded-2xl text-senior-lg font-black text-left bg-slate-100 hover:bg-amber-100 text-slate-900 border-4 border-slate-300 shadow-md touch-btn active:bg-amber-200 transition";
+        btn.innerText = opt.text;
+        btn.onclick = () => answerQuizQuestion(opt);
+        box.appendChild(btn);
+      });
+    }
+
+    function answerQuizQuestion(selected) {
+      if (selected.isCorrect) {
+        playTone('success');
+        addScore(30);
+        showModal("⭕ 大正解！", selected.exp, "🛡️");
+
+        currentQuizIndex++;
+        if (currentQuizIndex >= fixedQuizList.length) {
+          document.getElementById('quiz-content-area').classList.add('hidden');
+          document.getElementById('certificate-box').classList.remove('hidden');
+        } else {
+          renderQuizQuestion();
+        }
+      } else {
+        playTone('warn');
+        showModal("❌ あぶない！", selected.exp + "\nもう一度あぶなくない行動をえらびましょう！", "⚠️");
+      }
+    }
+
+    function resetSecurityQuiz() {
+      playTone('tap');
+      currentQuizIndex = 0;
+      document.getElementById('quiz-content-area').classList.remove('hidden');
+      document.getElementById('certificate-box').classList.add('hidden');
+      renderQuizQuestion();
+    }
+
+    // --- 初期化処理 ---
+    window.onload = function() {
+      updateStepView();
+      updateRealSearchDrillUI();
+      renderQuizQuestion();
+
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      document.getElementById('cert-date-display').innerText = `認定日：${year}年${month}月`;
+    };
+  </script>
+</body>
+</html>

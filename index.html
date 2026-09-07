@@ -1,841 +1,429 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>あんしん スマホ教室</title>
-    <style>
-        :root {
-            --primary: #1A237E;
-            --primary-light: #3F51B5;
-            --gold: #FFB300;
-            --gold-dark: #FF8F00;
-            --bg: #F5F7FA;
-            --text: #212121;
-            --gray: #757575;
-            --border: #BDBDBD;
-            --white: #FFFFFF;
-            --green: #2E7D32;
-            --red: #C62828;
-            --radius: 16px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-size: 20px;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header {
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 12px 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            transition: transform 0.3s ease, height 0.3s ease, opacity 0.3s ease;
-        }
-
-        header.compact {
-            transform: translateY(-100%);
-            height: 0;
-            padding: 0;
-            overflow: hidden;
-            opacity: 0;
-        }
-
-        .header-title {
-            font-size: 22px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-tabs {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-        }
-
-        .nav-tab {
-            background-color: rgba(255,255,255,0.15);
-            border: 2px solid rgba(255,255,255,0.3);
-            color: var(--white);
-            padding: 10px 2px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: bold;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .nav-tab.active {
-            background-color: var(--gold);
-            color: var(--primary);
-            border-color: var(--white);
-            transform: scale(1.03);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        main {
-            flex: 1;
-            padding: 20px;
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .mascot-banner {
-            background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
-            border: 3px solid var(--green);
-            border-radius: var(--radius);
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-
-        .mascot-banner.hidden {
-            display: none;
-        }
-
-        .mascot-icon {
-            font-size: 44px;
-            background: var(--white);
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            flex-shrink: 0;
-        }
-
-        .mascot-text {
-            font-size: 18px;
-            font-weight: bold;
-            color: #1B5E20;
-        }
-
-        .card {
-            background: var(--white);
-            border: 3px solid var(--primary-light);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: 0 6px 16px rgba(26,35,126,0.08);
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .card-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary);
-            border-bottom: 3px solid #E8EAF6;
-            padding-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .instruction {
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--text);
-            background: #FFFDE7;
-            border-left: 6px solid var(--gold);
-            padding: 14px 16px;
-            border-radius: 4px;
-        }
-
-        .input-group {
-            position: relative;
-            margin: 10px 0;
-        }
-
-        .search-box {
-            width: 100%;
-            padding: 18px 56px 18px 20px;
-            font-size: 24px;
-            border: 3px solid var(--primary);
-            border-radius: 30px;
-            outline: none;
-            background: var(--white);
-            color: var(--text);
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
-        }
-
-        .search-box:focus {
-            border-color: var(--gold-dark);
-            box-shadow: 0 0 0 4px rgba(255,179,0,0.3);
-        }
-
-        .search-icon-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-        }
-
-        .keyboard-diagram {
-            background: #ECEFF1;
-            border: 3px solid #B0BEC5;
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .keyboard-row {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .key-cap {
-            background: var(--white);
-            border: 2px solid #90A4AE;
-            border-bottom: 4px solid #78909C;
-            border-radius: 8px;
-            padding: 14px 10px;
-            font-size: 20px;
-            font-weight: bold;
-            min-width: 44px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            color: var(--text);
-        }
-
-        .key-cap.highlight {
-            background-color: var(--gold) !important;
-            border-color: var(--gold-dark) !important;
-            color: #000 !important;
-            transform: scale(1.08);
-            box-shadow: 0 0 15px rgba(255,179,0,0.8);
-            animation: pulse-key 1s infinite alternate;
-        }
-
-        @keyframes pulse-key {
-            from { transform: scale(1.04); }
-            to { transform: scale(1.12); }
-        }
-
-        .key-space {
-            flex: 3;
-            max-width: 220px;
-        }
-
-        .key-action {
-            flex: 1.5;
-            background-color: #E8EAF6;
-            color: var(--primary);
-        }
-
-        .candidate-bar {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 8px 4px;
-            background: #E3F2FD;
-            border: 2px dashed #90CAF9;
-            border-radius: 10px;
-            align-items: center;
-        }
-
-        .candidate-chip {
-            background: var(--white);
-            border: 2px solid var(--primary-light);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--primary);
-            cursor: pointer;
-            white-space: nowrap;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-
-        .candidate-chip.highlight {
-            background: var(--gold);
-            color: #000;
-            border-color: var(--gold-dark);
-            animation: pulse-key 1s infinite alternate;
-        }
-
-        .voice-overlay {
-            background: linear-gradient(135deg, #1A237E, #3F51B5);
-            color: var(--white);
-            border-radius: var(--radius);
-            padding: 40px 20px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 30px;
-            min-height: 380px;
-            box-shadow: inset 0 4px 20px rgba(0,0,0,0.3);
-        }
-
-        .mic-circle {
-            width: 110px;
-            height: 110px;
-            background: var(--gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
-            box-shadow: 0 0 30px rgba(255,179,0,0.8);
-            animation: mic-pulse 1.5s infinite;
-            cursor: pointer;
-        }
-
-        @keyframes mic-pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,179,0,0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 25px rgba(255,179,0,0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,179,0,0); }
-        }
-
-        .search-results-container {
-            background: var(--white);
-            border-radius: 8px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            border: 1px solid var(--border);
-        }
-
-        .google-mini-bar {
-            display: flex;
-            align-items: center;
-            background: #F1F3F4;
-            padding: 10px 16px;
-            border-radius: 24px;
-            font-size: 20px;
-            gap: 12px;
-            border: 1px solid #DADCE0;
-        }
-
-        .result-item {
-            padding: 14px;
-            border-radius: 8px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: #FAFAFA;
-        }
-
-        .result-item.sponsor {
-            border-left: 6px solid #FF9800;
-        }
-
-        .result-item.official {
-            border-left: 6px solid var(--green);
-            background: #F1F8E9;
-        }
-
-        .result-item.official:hover {
-            border-color: var(--green);
-            box-shadow: 0 4px 12px rgba(46,125,50,0.2);
-        }
-
-        .ad-tag {
-            font-size: 14px;
-            background: #E0E0E0;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        .result-url {
-            font-size: 15px;
-            color: #202124;
-            margin-bottom: 4px;
-        }
-
-        .result-heading {
-            font-size: 20px;
-            color: #1A0dab;
-            font-weight: bold;
-            text-decoration: underline;
-            margin-bottom: 6px;
-        }
-
-        .result-snippet {
-            font-size: 16px;
-            color: #4D5156;
-        }
-
-        .lens-viewfinder {
-            background: #000;
-            border-radius: var(--radius);
-            overflow: hidden;
-            position: relative;
-            min-height: 400px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 20px;
-            color: var(--white);
-        }
-
-        .lens-target-box {
-            border: 3px dashed var(--gold);
-            border-radius: 12px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.05);
-            margin: 10px 0;
-            position: relative;
-        }
-
-        .shutter-btn {
-            width: 80px;
-            height: 80px;
-            background: var(--white);
-            border: 5px solid var(--gold);
-            border-radius: 50%;
-            margin: 0 auto;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: transform 0.1s;
-        }
-
-        .shutter-btn:active {
-            transform: scale(0.92);
-        }
-
-        .quiz-card {
-            background: #FFEBEE;
-            border: 3px solid var(--red);
-            border-radius: var(--radius);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .quiz-option {
-            background: var(--white);
-            border: 2px solid var(--red);
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--text);
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-        }
-
-        .quiz-option:hover {
-            background: #FFCDD2;
-        }
-
-        .certificate-box {
-            background: linear-gradient(135deg, #FFF9C4, #FFFDE7);
-            border: 6px solid var(--gold-dark);
-            border-radius: 16px;
-            padding: 30px 20px;
-            text-align: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .cert-title {
-            font-size: 28px;
-            font-weight: bold;
-            color: #B71C1C;
-        }
-
-        .cert-name {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--primary);
-            border-bottom: 2px solid var(--gold);
-            display: inline-block;
-            padding: 0 20px 4px 20px;
-            margin: 10px 0;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            padding: 16px 24px;
-            border-radius: 14px;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            text-align: center;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>あんしんスマホ教室</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#233255;
+  --navy-deep:#182238;
+  --gold:#E3A83B;
+  --gold-deep:#C68A22;
+  --paper:#FBF6EC;
+  --paper-deep:#F1E9D8;
+  --ink:#2B2620;
+  --warn:#C8553D;
+  --warn-bg:#FBE7DE;
+  --success:#3E7A4C;
+  --success-bg:#E4F3E6;
+  --font:'BIZ UDPGothic','Hiragino Maru Gothic ProN','Yu Gothic','Meiryo',sans-serif;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:26px 12px;
+  background:radial-gradient(circle at 20% 15%,#F3EAD4,#E6DABF 70%);
+  font-family:var(--font);
+  color:var(--ink);
+}
+#phone{
+  width:min(430px,96vw);
+  background:var(--paper);
+  border:4px solid var(--navy);
+  border-radius:32px;
+  box-shadow:10px 10px 0 rgba(35,50,85,.15);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-height:780px;
+  position:relative;
+}
+#topbar{
+  background:var(--navy);
+  color:#fff;
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.back-link{cursor:pointer;font-size:14px;opacity:.9;flex-shrink:0;}
+.app-title{flex:1;text-align:center;font-weight:700;font-size:18px;}
+.version-badge{background:rgba(255,255,255,.18);padding:3px 10px;border-radius:20px;font-size:11px;flex-shrink:0;}
+.progress-strip{display:flex;justify-content:center;gap:9px;padding:12px;background:var(--paper-deep);border-bottom:2px solid var(--navy);}
+.dot{width:38px;height:38px;border-radius:50%;border:3px solid var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;background:#fff;color:var(--navy);font-size:15px;}
+.dot.done{background:var(--gold);border-color:var(--gold-deep);color:#fff;}
+.dot.current{box-shadow:0 0 0 4px rgba(227,168,59,.4);}
+#content{flex:1;padding:16px 20px 20px;overflow-y:auto;min-height:0;}
+.fade-in{animation:fadeSlide .35s ease;}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+#mascotWrap{display:flex;align-items:flex-start;gap:10px;padding:14px 18px;border-bottom:2px dashed var(--navy);background:var(--paper);flex-shrink:0;}
+#mascotFace{font-size:34px;line-height:1;flex-shrink:0;}
+.bubble{background:#fff;border:3px solid var(--navy);border-radius:16px;padding:11px 15px;font-size:16px;line-height:1.55;flex:1;min-height:1.4em;}
+.bubble.warn{border-color:var(--warn);background:var(--warn-bg);color:#7a3421;}
+.bubble.success{border-color:var(--success);background:var(--success-bg);color:#215030;}
+.btn-primary{background:var(--navy);color:#fff;border:none;border-radius:14px;padding:16px 20px;font-size:19px;font-weight:700;width:100%;cursor:pointer;font-family:var(--font);}
+.btn-primary:active{transform:scale(.97);}
+.btn-gold{background:var(--gold);color:#3a2a05;}
+.btn-secondary{background:#fff;color:var(--navy);border:3px solid var(--navy);border-radius:14px;padding:12px 18px;font-size:17px;font-weight:700;width:100%;cursor:pointer;font-family:var(--font);margin-top:10px;}
+.btn-secondary:active{background:var(--paper-deep);}
+.real-input{width:100%;font-size:36px;text-align:center;padding:20px 14px;border:3px solid var(--navy);border-radius:16px;font-family:var(--font);color:var(--navy);letter-spacing:2px;background:#fff;}
+.real-input:focus{outline:4px solid var(--gold);outline-offset:2px;border-color:var(--gold-deep);}
+.real-input::placeholder{color:#bbb;font-size:20px;}
+.searchbar{display:flex;align-items:center;gap:10px;border:3px solid var(--navy);border-radius:30px;padding:9px 16px;background:#fff;}
+.mic-btn{background:var(--navy);color:#fff;border:none;width:52px;height:52px;border-radius:50%;font-size:22px;cursor:pointer;flex-shrink:0;}
+.waveform{font-size:56px;animation:pulseScale 1s infinite;text-align:center;}
+@keyframes pulseScale{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+.viewfinder{background:#111;border-radius:16px;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;font-size:90px;position:relative;overflow:hidden;}
+.flash{position:absolute;inset:0;background:#fff;animation:flashOut .5s forwards;}
+@keyframes flashOut{from{opacity:1;}to{opacity:0;}}
+.shutter{width:74px;height:74px;border-radius:50%;background:#fff;border:6px solid var(--navy);display:block;margin:18px auto 0;cursor:pointer;}
+.result-card{border:3px solid var(--navy);border-radius:14px;padding:14px;margin-bottom:12px;background:#fff;cursor:pointer;}
+.result-card.ad{border-color:#999;background:#F5F5F2;}
+.ad-badge{display:inline-block;background:#DDD;color:#555;font-size:12px;padding:2px 8px;border-radius:8px;margin-bottom:6px;}
+.result-title{font-size:17px;font-weight:700;color:#1a4fa0;}
+.result-url{font-size:13px;color:#3a7d3a;margin-top:2px;}
+.quiz-opt{display:block;width:100%;text-align:left;border:3px solid var(--navy);border-radius:14px;padding:14px 16px;font-size:17px;background:#fff;margin-bottom:10px;cursor:pointer;font-family:var(--font);color:var(--ink);}
+.chapter-card{border:3px solid var(--navy);border-radius:16px;padding:14px;margin-bottom:13px;display:flex;align-items:center;gap:13px;cursor:pointer;background:#fff;}
+.chapter-card.locked{opacity:.5;cursor:not-allowed;}
+.chapter-card.done{border-color:var(--gold-deep);background:#FFF8E8;}
+.icon-circle{width:50px;height:50px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.cert{border:6px double var(--gold-deep);background:linear-gradient(#fff,var(--paper));border-radius:20px;padding:26px 18px;text-align:center;}
+.confetti{position:absolute;top:-10px;width:8px;height:8px;border-radius:2px;animation:fall linear forwards;z-index:50;}
+@keyframes fall{to{transform:translateY(760px) rotate(360deg);opacity:.2;}}
+</style>
 </head>
 <body>
+<div id="phone">
+  <div id="topbar">
+    <span id="backLink" class="back-link" onclick="goMenu()" style="visibility:hidden;">◀ もくじ</span>
+    <span class="app-title">あんしんスマホ教室</span>
+    <span class="version-badge">v1.0.0</span>
+  </div>
+  <div id="progressStrip"></div>
+  <div id="mascotWrap">
+    <div id="mascotFace">🙂</div>
+    <div id="mascotBubble" class="bubble">ようこそ！</div>
+  </div>
+  <div id="content"></div>
+</div>
+<script>
+let state={screen:'start',userName:'',progress:[false,false,false,false,false],searchQuery:''};
+let mascotRevertTimer=null;
+let currentInstruction='';
 
-    <header id="main-header">
-        <div class="header-title">あんしん スマホ教室</div>
-        <div class="nav-tabs">
-            <div class="nav-tab active" onclick="switchChapter(1)">①もじ</div>
-            <div class="nav-tab" onclick="switchChapter(2)">②声で</div>
-            <div class="nav-tab" onclick="switchChapter(3)">③探す</div>
-            <div class="nav-tab" onclick="switchChapter(4)">④写真</div>
-            <div class="nav-tab" onclick="switchChapter(5)">⑤防犯</div>
-        </div>
-    </header>
+function setContent(html){
+  const el=document.getElementById('content');
+  el.innerHTML=html;
+  el.classList.remove('fade-in');
+  void el.offsetWidth;
+  el.classList.add('fade-in');
+}
+function mascotSay(text,mood,revertMs){
+  const bubble=document.getElementById('mascotBubble');
+  const face=document.getElementById('mascotFace');
+  bubble.textContent=text;
+  bubble.className='bubble'+(mood?(' '+mood):'');
+  face.textContent = mood==='success' ? '😊' : mood==='warn' ? '🙂' : '🙂';
+  if(mascotRevertTimer) clearTimeout(mascotRevertTimer);
+  if(revertMs){
+    mascotRevertTimer=setTimeout(()=>{
+      bubble.textContent=currentInstruction;
+      bubble.className='bubble';
+      face.textContent='🙂';
+    },revertMs);
+  }
+}
+function setInstruction(text){ currentInstruction=text; mascotSay(text,null,null); }
 
-    <main>
-        <div id="mascot-banner" class="mascot-banner">
-            <div class="mascot-icon">🤖</div>
-            <div class="mascot-text" id="mascot-msg">こんにちは！きょうは安全にスマホをつかう練習をしましょう！</div>
-        </div>
+function renderProgress(activeIdx){
+  const labels=['①','②','③','④','⑤'];
+  let html='<div class="progress-strip">';
+  for(let i=0;i<5;i++){
+    let cls='dot';
+    if(state.progress[i]) cls+=' done';
+    if(i===activeIdx) cls+=' current';
+    html+='<div class="'+cls+'">'+labels[i]+'</div>';
+  }
+  html+='</div>';
+  document.getElementById('progressStrip').innerHTML=html;
+}
 
-        <!-- ================= CHAPTER 1 ================= -->
-        <section id="chapter-1" class="chapter-content">
-            <div class="card">
-                <div class="card-title">① かな文字を入力する練習</div>
-                <div class="instruction" id="ch1-instruction">① 下の入力枠をタッチして、「かなざわ」と入力してみましょう</div>
-                
-                <div class="input-group">
-                    <input type="text" id="ch1-input" class="search-box" placeholder="ここをタッチしてね" onfocus="handleInputFocus()" onblur="handleInputBlur()">
-                    <button class="search-icon-btn" onclick="triggerCh1Search()">🔍</button>
-                </div>
+/* ---------- START ---------- */
+function renderStart(){
+  document.getElementById('backLink').style.visibility='hidden';
+  document.getElementById('progressStrip').innerHTML='';
+  setContent(
+    '<div style="text-align:center;padding-top:6px;">'+
+    '<div style="font-size:66px;">📱💛</div>'+
+    '<h1 style="font-size:24px;margin:10px 0 6px;color:var(--navy);">あんしんスマホ教室</h1>'+
+    '<p style="font-size:15px;color:#555;margin-bottom:24px;">スマホの つかいかたを ゆっくり れんしゅうできます</p>'+
+    '<label style="display:block;font-size:14px;margin-bottom:6px;color:#555;text-align:left;">おなまえ（にゅうりょくしなくても だいじょうぶです）</label>'+
+    '<input id="nameInput" type="text" placeholder="やまだ たろう" style="width:100%;font-size:18px;padding:12px;border:3px solid var(--navy);border-radius:12px;margin-bottom:22px;box-sizing:border-box;font-family:var(--font);">'+
+    '<button class="btn-primary" onclick="startApp()">はじめる</button>'+
+    '</div>'
+  );
+  setInstruction('おなまえを にゅうりょくして「はじめる」を おしてね（にゅうりょくは しなくても OK です）');
+}
+function startApp(){
+  state.userName=document.getElementById('nameInput').value.trim();
+  goMenu();
+}
 
-                <div id="ch1-candidates" class="candidate-bar hidden">
-                    <div class="candidate-chip highlight" onclick="selectCh1Candidate('金沢')">金沢</div>
-                    <div class="candidate-chip" onclick="selectCh1Candidate('カナザワ')">カナザワ</div>
-                </div>
+/* ---------- MENU ---------- */
+function goMenu(){ state.screen='menu'; renderMenu(); }
+function renderMenu(){
+  document.getElementById('backLink').style.visibility='hidden';
+  document.getElementById('progressStrip').innerHTML='';
+  const chapters=[
+    {title:'もじ入力',desc:'ひらがな・すうじ・えいごの うちかた',icon:'⌨️'},
+    {title:'声で入力',desc:'こえで けんさくする ほうほう',icon:'🎤'},
+    {title:'文字で探す',desc:'けんさく けっかの みわけかた',icon:'🔍'},
+    {title:'写真で探す',desc:'カメラで しらべる ほうほう',icon:'📷'},
+    {title:'あぶない！スマホ防犯パトロール',desc:'サギから みを まもる くいず',icon:'🛡️'}
+  ];
+  let cardsHtml='';
+  for(let i=0;i<5;i++){
+    const locked=i>0 && !state.progress[i-1];
+    const done=state.progress[i];
+    let cls='chapter-card'+(locked?' locked':'')+(done?' done':'');
+    let statusHtml = done ? '<span style="color:var(--gold-deep);font-weight:700;">できました ✓</span>'
+      : locked ? '<span style="color:#999;">🔒 じゅんばんに すすめてね</span>'
+      : '<span style="color:var(--navy);font-weight:700;">やってみる</span>';
+    cardsHtml += '<div class="'+cls+'" '+(locked?'':'onclick="enterChapter('+i+')"')+'>'+
+      '<div class="icon-circle">'+chapters[i].icon+'</div>'+
+      '<div style="flex:1;">'+
+      '<div style="font-weight:700;font-size:16px;color:var(--navy);">'+(i+1)+'. '+chapters[i].title+'</div>'+
+      '<div style="font-size:13px;color:#666;margin:2px 0 6px;">'+chapters[i].desc+'</div>'+
+      statusHtml+'</div></div>';
+  }
+  const allDone=state.progress.every(Boolean);
+  const greet=state.userName? state.userName+'さん、' : '';
+  setContent(
+    '<h2 style="font-size:19px;color:var(--navy);margin:0 0 4px;">'+greet+'ようこそ！</h2>'+
+    '<p style="font-size:13px;color:#666;margin-bottom:16px;">すきな じゅんばんで れんしゅうしましょう</p>'+
+    cardsHtml+
+    (allDone? '<button class="btn-primary btn-gold" style="margin-top:6px;" onclick="showCertificate()">にんていしょうを みる 🏅</button>' : '')
+  );
+  setInstruction('やりたい れんしゅうを タップしてね');
+}
+function enterChapter(i){
+  document.getElementById('backLink').style.visibility='visible';
+  if(i===0){ state.screen='ch1'; state.ch1={stepIndex:0}; renderCh1(); }
+  if(i===1){ state.screen='ch2'; state.ch2={step:0}; renderCh2(); }
+  if(i===2){ state.screen='ch3'; renderCh3(); }
+  if(i===3){ state.screen='ch4'; state.ch4={step:0}; renderCh4(); }
+  if(i===4){ state.screen='ch5'; state.ch5={q:0}; renderCh5(); }
+}
 
-                <div class="keyboard-diagram" id="ch1-keyboard-diagram">
-                    <div style="font-size: 15px; font-weight: bold; color: var(--gray); text-align: center;">👇 いま押すキーの場所</div>
-                    <div class="keyboard-row">
-                        <div class="key-cap" id="key-ka">か</div>
-                        <div class="key-cap" id="key-na">な</div>
-                        <div class="key-cap" id="key-za">ざ</div>
-                        <div class="key-cap" id="key-wa">わ</div>
-                    </div>
-                    <div class="keyboard-row">
-                        <div class="key-cap key-space highlight" id="key-space">スペース（変換）</div>
-                        <div class="key-cap key-action" id="key-enter">検索 / 確定</div>
-                    </div>
-                </div>
-            </div>
-        </section>
+/* ---------- CHAPTER 1: もじ入力（本物のキーボードを使用） ---------- */
+const CH1_STEPS=[
+  {target:'い', goal:'ひらがなの「い」を 入力する れんしゅうです。', instr:'キーボードの「あ」ボタンを ２かい タップしてね（あ→い に かわります）'},
+  {target:'が', goal:'濁点（てんてん）がついた「が」を 入力する れんしゅうです。', instr:'「か」ボタンを １かい タップしてから、右下の「゛゜」ボタンを １かい タップしてね（か→が に かわります）'},
+  {target:'ょ', goal:'小さい文字「ょ」を 入力する れんしゅうです。', instr:'「や」ボタンを ３かい タップして「よ」を出してから、「小」（または「大/小」）ボタンを １かい タップしてね（よ→ょ に かわります）'},
+  {target:'ー', goal:'のばす記号「ー」を 入力する れんしゅうです。', instr:'「ー」の ボタンを さがして おしてね（見つからない時は「わ」ボタンを ４かい タップしてみてね）'},
+  {target:'天気', goal:'ひらがなを 漢字に かえる（変換する）れんしゅうです。', instr:'「て」「ん」「き」の じゅんに 入力してから、へんかん候補の中から「天気」を タップして えらんでね'},
+  {target:'110', goal:'数字「110」を 入力する れんしゅうです。', instr:'左下の 切りかえボタン（「?123」と 書かれています）を タップして 数字キーボードに してから「1」「1」「0」の じゅんに おしてね'},
+  {target:'Hi', goal:'英語「Hi」を 入力する れんしゅうです。', instr:'左下の 切りかえボタン（「あa」と 書かれています）を タップして 英語キーボードに してから「H」「i」と 入力してね（Hは大文字。さきに ⇧シフトキーを おしてね）'}
+];
+function renderCh1(){
+  renderProgress(0);
+  const step=CH1_STEPS[state.ch1.stepIndex];
+  setInstruction(step.goal+' '+step.instr);
+  setContent(
+    '<input id="ch1input" class="real-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="onCh1Input(this.value)" placeholder="ここに にゅうりょく">'+
+    '<button class="btn-secondary" onclick="eraseChar()">⌫ １文字 けす</button>'+
+    '<p style="font-size:13px;color:#777;text-align:center;margin-top:10px;">↑ 入力らんを タップして、じぶんの キーボードで 入力してね</p>'
+  );
+  const el=document.getElementById('ch1input');
+  if(el) el.focus();
+}
+function eraseChar(){
+  const el=document.getElementById('ch1input');
+  if(!el) return;
+  el.value=el.value.slice(0,-1);
+  el.focus();
+}
+function onCh1Input(value){
+  const s=state.ch1;
+  const step=CH1_STEPS[s.stepIndex];
+  if(!step) return;
+  if(value.trim()===step.target){
+    mascotSay('せいかい！じょうずですね ✨','success',null);
+    setTimeout(()=>{
+      s.stepIndex++;
+      if(s.stepIndex>=CH1_STEPS.length){ finishCh1(); } else { renderCh1(); }
+    },900);
+  }
+}
+function finishCh1(){ state.progress[0]=true; enterChapter(1); }
 
-        <!-- ================= CHAPTER 2 ================= -->
-        <section id="chapter-2" class="chapter-content hidden">
-            <div class="card">
-                <div class="card-title">② 声でかんたん検索</div>
-                <div class="instruction" id="ch2-instruction">右側にある「マイク（🎙️）マーク」を押して話してみましょう</div>
+/* ---------- CHAPTER 2: 声で入力 ---------- */
+function renderCh2(){
+  renderProgress(1);
+  const s=state.ch2;
+  if(s.step===0){
+    setInstruction('マイクの ボタンを おしてね 🎤');
+    setContent('<div class="searchbar"><span style="flex:1;color:#999;">けんさく</span><button class="mic-btn" onclick="tapMic()">🎤</button></div>');
+  } else if(s.step===1){
+    setInstruction('お話しください…');
+    setContent('<div class="waveform">🎙️</div><p style="text-align:center;margin-top:14px;font-size:17px;color:var(--navy);">お話しください…</p>');
+  } else if(s.step===2){
+    setInstruction('うまく ききとれました！');
+    setContent('<div class="searchbar" style="border-color:var(--success);"><span style="flex:1;color:var(--navy);font-weight:700;">金沢 天気</span><span style="color:var(--success);font-size:22px;">✓</span></div>');
+  }
+}
+function tapMic(){
+  state.ch2.step=1; renderCh2();
+  setTimeout(()=>{
+    state.ch2.step=2; renderCh2();
+    mascotSay('うまく ききとれました！','success',null);
+    setTimeout(()=>{ state.progress[1]=true; state.searchQuery='金沢 天気'; enterChapter(2); },1400);
+  },2000);
+}
 
-                <div class="google-mini-bar" style="background:#fff; border:2px solid var(--primary); justify-content: space-between; padding: 12px 20px;">
-                    <span style="color:#757575; font-size:20px;">ご用件は何ですか？</span>
-                    <button onclick="startVoiceSearch()" style="background:var(--gold); border:none; width:50px; height:50px; border-radius:50%; font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.2);">🎙️</button>
-                </div>
+/* ---------- CHAPTER 3: 文字で探す ---------- */
+function renderCh3(){
+  renderProgress(2);
+  setInstruction('けんさく けっかから、こうしきの ページを えらんでね');
+  const q=state.searchQuery||'金沢 天気';
+  setContent(
+    '<p style="font-size:13px;color:#666;margin-bottom:12px;">「'+q+'」の けんさく けっか</p>'+
+    '<div class="result-card ad" onclick="tapSearchResult(false)"><span class="ad-badge">スポンサー</span>'+
+    '<div class="result-title">天気予報アプリを 今すぐ ダウンロード</div><div class="result-url">app-tenki.example.com</div></div>'+
+    '<div class="result-card ad" onclick="tapSearchResult(false)"><span class="ad-badge">スポンサー</span>'+
+    '<div class="result-title">当たる占いで 今日の運勢をチェック</div><div class="result-url">uranai.example.com</div></div>'+
+    '<div class="result-card" onclick="tapSearchResult(true)">'+
+    '<div class="result-title">石川県 金沢市の天気 - 気象庁</div><div class="result-url">jma.go.jp</div></div>'
+  );
+}
+function tapSearchResult(ok){
+  if(ok){
+    mascotSay('せいかい！気象庁は こうしきの ページです ✨','success',null);
+    setTimeout(()=>{ state.progress[2]=true; enterChapter(3); },1200);
+  } else {
+    mascotSay('それは「こうこく」です。下の「気象庁」を おしてみてね','warn',2400);
+  }
+}
 
-                <div id="voice-active-screen" class="voice-overlay hidden">
-                    <div style="font-size: 26px; font-weight: bold;">お話しください...</div>
-                    <div class="mic-circle" onclick="finishVoiceSearch()">🎙️</div>
-                    <div style="font-size: 20px; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 20px;">「金沢の天気」と話してみよう</div>
-                </div>
-            </div>
-        </section>
+/* ---------- CHAPTER 4: 写真で探す ---------- */
+function renderCh4(){
+  renderProgress(3);
+  const s=state.ch4;
+  if(s.step===0){
+    setInstruction('カメラの ボタンを おしてね 📷');
+    setContent('<div class="searchbar"><span style="flex:1;color:#999;">けんさく</span><button class="mic-btn" onclick="tapCameraIcon()">📷</button></div>');
+  } else if(s.step===1){
+    setInstruction('シャッターボタンを おしてね');
+    setContent('<div class="viewfinder" id="vf">🌼</div><button class="shutter" onclick="tapShutter()"></button>');
+  } else if(s.step===2){
+    setInstruction('けんさく けっかから、こうしきの ページを えらんでね');
+    setContent(
+      '<p style="font-size:13px;color:#666;margin-bottom:12px;">この しゃしんの けんさく けっか</p>'+
+      '<div class="result-card ad" onclick="tapLensResult(false)"><span class="ad-badge">スポンサー</span>'+
+      '<div class="result-title">たんぽぽの種 通販サイト</div><div class="result-url">shop-tanpopo.example.com</div></div>'+
+      '<div class="result-card" onclick="tapLensResult(true)">'+
+      '<div class="result-title">タンポポ - Wikipedia</div><div class="result-url">ja.wikipedia.org</div></div>'
+    );
+  }
+}
+function tapCameraIcon(){ state.ch4.step=1; renderCh4(); }
+function tapShutter(){
+  const vf=document.getElementById('vf');
+  if(vf) vf.insertAdjacentHTML('beforeend','<div class="flash"></div>');
+  mascotSay('うまく とれました！','success',1200);
+  setTimeout(()=>{ state.ch4.step=2; renderCh4(); },900);
+}
+function tapLensResult(ok){
+  if(ok){
+    mascotSay('せいかい！ウィキペディアは こうしきの じょうほうです ✨','success',null);
+    setTimeout(()=>{ state.progress[3]=true; enterChapter(4); },1200);
+  } else {
+    mascotSay('それは「こうこく」です。下の Wikipedia を おしてみてね','warn',2400);
+  }
+}
 
-        <!-- ================= CHAPTER 3 ================= -->
-        <section id="chapter-3" class="chapter-content hidden">
-            <div id="ch3-view-input" class="card">
-                <div class="card-title">③ 文字で調べる（インターネット検索）</div>
-                <div class="instruction">「金沢 天気」と入力して、右下の「検索」を押しましょう</div>
+/* ---------- CHAPTER 5: スマホ防犯パトロール ---------- */
+const QUIZ=[
+  {q:'「かんぷきん（還付金）が あります。ATMへ 行ってください」と でんわが ありました。どうする？',opts:[
+    {t:'言われたとおりに ATMへ 行く',ok:false,fb:'これは サギの てぐちです。ATMで かんぷきんは もどりません。'},
+    {t:'赤い（切る）ボタンを おして、でんわを 切る',ok:true,fb:''}
+  ],tip:'せいかい！でんわを切ったら、ご家族に そうだんしてね ✨'},
+  {q:'「高額 当選しました！うけとりは こちら」という メールが きました。どうする？',opts:[
+    {t:'青い文字（リンク）を おす',ok:false,fb:'知らない メールの リンクは あぶないです。'},
+    {t:'なにも おさずに、〇（ホーム）ボタンを おす',ok:true,fb:''}
+  ],tip:'せいかい！あやしいメールは さわらないのが いちばんです ✨'},
+  {q:'画面に「ウイルスに かんせん！すぐ この番号へ でんわを」と でました。どうする？',opts:[
+    {t:'表示された 番号に すぐ でんわする',ok:false,fb:'これは「サポート詐欺」の 手口です。'},
+    {t:'〇（ホーム）ボタンを おして、その画面から はなれる',ok:true,fb:''}
+  ],tip:'せいかい！しんぱいな時は ご家族や お店に そうだんしてね ✨'},
+  {q:'SNSで「だれでも かんたんに 月50万円」の こうこくを 見ました。どうする？',opts:[
+    {t:'「今すぐ 登録」の ボタンを おす',ok:false,fb:'うまい話には ちゅういが ひつようです。'},
+    {t:'なにも おさずに、〇（ホーム）ボタンを おす',ok:true,fb:''}
+  ],tip:'せいかい！うまい話は おさないのが いちばんです ✨'},
+  {q:'「口座が とうけつされました。名義を貸してください」と でんわが ありました。どうする？',opts:[
+    {t:'言われた とおりに てつづきする',ok:false,fb:'名義を貸すのは サギに 協力することに なります。'},
+    {t:'赤い（切る）ボタンを おして、でんわを 切る',ok:true,fb:''}
+  ],tip:'せいかい！でんわを切ったら、ご家族や 警察（＃9110）に そうだんしてね ✨'}
+];
+function renderCh5(){
+  renderProgress(4);
+  const s=state.ch5; const item=QUIZ[s.q];
+  setInstruction((s.q+1)+'もんめ / ぜんぶで5もん。どのボタンを おすと あんしんか えらんでね');
+  let opts=item.opts.map((o,i)=>'<button class="quiz-opt" onclick="tapQuizOpt('+i+')">'+o.t+'</button>').join('');
+  setContent('<p style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:16px;line-height:1.6;">'+item.q+'</p>'+opts);
+}
+function tapQuizOpt(i){
+  const s=state.ch5; const item=QUIZ[s.q]; const o=item.opts[i];
+  if(o.ok){
+    mascotSay(item.tip,'success',null);
+    setTimeout(()=>{
+      if(s.q<4){ s.q++; renderCh5(); } else { state.progress[4]=true; showCertificate(); }
+    },1300);
+  } else {
+    mascotSay(o.fb+' もういちど、あんしんな ほうを えらんでね','warn',2800);
+  }
+}
 
-                <div class="input-group">
-                    <input type="text" id="ch3-input" class="search-box" value="金沢 天気" readonly onclick="executeSearchTransition()">
-                    <button class="search-icon-btn" onclick="executeSearchTransition()">🔍</button>
-                </div>
-            </div>
+/* ---------- 認定証 ---------- */
+function showCertificate(){
+  state.screen='cert';
+  document.getElementById('backLink').style.visibility='visible';
+  document.getElementById('progressStrip').innerHTML='';
+  const name=state.userName? state.userName : 'がんばった あなた';
+  const dateStr=new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'});
+  setContent(
+    '<div class="cert"><div style="font-size:38px;">🏅</div>'+
+    '<h2 style="color:var(--gold-deep);margin:8px 0 4px;font-size:21px;">金賞 スマホあんしん認定証</h2>'+
+    '<p style="font-size:18px;font-weight:700;margin:16px 0 6px;color:var(--navy);">'+name+' さん</p>'+
+    '<p style="font-size:14px;color:#555;line-height:1.7;">Androidスマホの きほん そうさと、ぼうはんの ちしきを しっかり みにつけました。</p>'+
+    '<p style="font-size:12px;color:#888;margin-top:16px;">'+dateStr+'</p></div>'+
+    '<button class="btn-primary" style="margin-top:18px;" onclick="restartAll()">もくじに もどる</button>'
+  );
+  setInstruction('おめでとうございます！すべての れんしゅうが おわりました 🎉');
+  launchConfetti();
+}
+function restartAll(){ goMenu(); }
+function launchConfetti(){
+  const colors=['#E3A83B','#233255','#3E7A4C','#C8553D'];
+  for(let i=0;i<22;i++){
+    const el=document.createElement('div');
+    el.className='confetti';
+    el.style.left=(Math.random()*100)+'%';
+    el.style.background=colors[i%colors.length];
+    el.style.animationDelay=(Math.random()*0.6)+'s';
+    el.style.animationDuration=(2+Math.random()*1.5)+'s';
+    document.getElementById('phone').appendChild(el);
+    setTimeout(()=>{ el.remove(); },4200);
+  }
+}
 
-            <div id="ch3-view-results" class="card hidden">
-                <div class="card-title">③ 検索結果から選ぶ練習</div>
-                <div class="instruction">広告（スポンサー）を避けて、本物の公式ページをえらびましょう</div>
-
-                <div class="search-results-container">
-                    <div class="google-mini-bar">
-                        <span>🔍 金沢 天気</span>
-                    </div>
-
-                    <div class="result-item sponsor" onclick="alert('これは広告（スポンサー）です。下の本当のホームページを探しましょう！')">
-                        <div class="result-url"><span class="ad-tag">スポンサー</span> www.weather-ad-dummy.com</div>
-                        <div class="result-heading">金沢の旅行・ホテル・おすすめ情報</div>
-                        <div class="result-snippet">金沢観光の予約はこちら。お得なクーポン配布中。</div>
-                    </div>
-
-                    <div class="result-item official" onclick="completeChapter3Results()">
-                        <div class="result-url">www.jma.go.jp › forecast › Ishikawa</div>
-                        <div class="result-heading">気象庁 | 金沢市の天気予報</div>
-                        <div class="result-snippet">金沢市の今日の天気、降水確率、週間予報をお届けします。</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= CHAPTER 4 ================= -->
-        <section id="chapter-4" class="chapter-content hidden">
-            <div id="ch4-view-bar" class="card">
-                <div class="card-title">④ 写真やカメラでしらべる</div>
-                <div class="instruction">検索バーの右端にある「カメラ（レンズ）マーク」を押してカメラを起動しましょう</div>
-
-                <div class="google-mini-bar" style="background:#fff; border:2px solid var(--primary); justify-content: space-between; padding: 12px 20px;">
-                    <span style="color:#757575; font-size:20px;">写真を検索...</span>
-                    <button onclick="openLensCamera()" style="background:none; border:none; font-size:30px; cursor:pointer;">📷</button>
-                </div>
-            </div>
-
-            <div id="ch4-view-camera" class="card hidden" style="background:#111; color:#fff; border-color:#333;">
-                <div style="font-size: 20px; text-align: center; color: var(--gold);">たんぽぽの花を写しています</div>
-                <div class="lens-viewfinder">
-                    <div class="lens-target-box">
-                        <div style="font-size: 60px;">🌼</div>
-                        <div style="font-size: 16px; margin-top: 10px; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 8px;">ここに合わせる</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <button class="shutter-btn" onclick="captureLensPhoto()"></button>
-                        <div style="font-size: 15px; margin-top: 8px; color: #ccc;">丸いボタンを押して撮影</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="ch4-view-lens-results" class="card hidden">
-                <div class="card-title">④ 写真のしらべ方（正解をえらぶ）</div>
-                <div class="instruction">写真に写っている「たんぽぽ」の公式図解をタップしましょう</div>
-
-                <div class="search-results-container">
-                    <div style="background:#E0F7FA; padding:12px; border-radius:8px; font-weight:bold; color:#006064; text-align:center;">
-                        📷 画像検索の結果 (一致度 99%)
-                    </div>
-                    
-                    <div class="result-item sponsor" onclick="alert('これは関係のない広告です。下の植物図鑑をえらびましょう。')">
-                        <div class="result-url"><span class="ad-tag">スポンサー</span> www.garden-shop-dummy.com</div>
-                        <div class="result-heading">庭木・雑草の駆除サービス</div>
-                        <div class="result-snippet">お庭の雑草やお花のトラブルをプロが迅速解決！</div>
-                    </div>
-
-                    <div class="result-item official" onclick="completeChapter4Lens()">
-                        <div class="result-url">ja.wikipedia.org › wiki › タンポポ</div>
-                        <div class="result-heading">タンポポ - Wikipedia（植物の解説）</div>
-                        <div class="result-snippet">キク科の多年草。日本各地に自生し、黄色い花を咲かせる身近な野草。</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= CHAPTER 5 ================= -->
-        <section id="chapter-5" class="chapter-content hidden">
-            <div class="card" id="quiz-container">
-                <div class="card-title">⑤ あぶない！スマホ防犯パトロール</div>
-                <div class="instruction" id="quiz-question">Q1. 見知らぬ番号から「還付金があります。ATMへ行ってください」と電話がありました。どうする？</div>
-                
-                <div style="display: flex; flex-direction: column; gap: 12px;" id="quiz-options">
-                    <button class="quiz-option" onclick="answerQuiz(false)">A. すぐにATMに行って操作する</button>
-                    <button class="quiz-option" onclick="answerQuiz(true)">B. 詐欺なので絶対に無視して電話を切る</button>
-                </div>
-            </div>
-
-            <div id="certificate-screen" class="certificate-box hidden">
-                <div style="font-size: 24px; font-weight: bold; color: #555;">修了おめでとうございます！</div>
-                <div class="cert-title">金賞 スマホあんしん認定証</div>
-                <div style="font-size: 18px;">ご本人様は、安全で正しいスマホ操作と<br>防犯知識をみごとにマスターされました！</div>
-                <div class="cert-name">西野 嘉泰 殿</div>
-                <div style="font-size: 16px; color: #666;">令和8年 あんしんスマホ教室</div>
-                <button class="btn-primary" onclick="window.print()" style="margin: 0 auto; background: var(--green);">🖨️ この認定証を印刷する</button>
-            </div>
-        </section>
-    </main>
-
-    <script>
-        let currentChapter = 1;
-        let quizIndex = 0;
-
-        const quizData = [
-            {
-                q: "Q1. 見知らぬ番号から「還付金があります。ATMへ行ってください」と電話がありました。どうする？",
-                options: [
-                    { text: "A. すぐにATMに行って操作する", correct: false },
-                    { text: "B. 詐欺なので絶対に無視して電話を切る", correct: true }
-                ]
-            },
-            {
-                q: "Q2. メールのリンクを開いたら「当選しました！」と出ました。どうする？",
-                options: [
-                    { text: "A. すぐに個人情報やカード番号を入力する", correct: false },
-                    { text: "B. 偽物の詐欺メールなのですぐに画面を閉じる", correct: true }
-                ]
-            }
-        ];
-
-        function switchChapter(num) {
-            currentChapter = num;
-            document.querySelectorAll('.chapter-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`chapter-${num}`).classList.remove('hidden');
-
-            document.querySelectorAll('.nav-tab').forEach((tab, index) => {
-                if(index + 1 === num) {
-                    tab.classList.add('active');
-                } else {
-                    tab.classList.remove('active');
-                }
-            });
-
-            const mascotMsgs = {
-                1: "文字入力の練習です。入力枠をタッチしてみましょう！",
-                2: "声で検索する練習です。マイクボタンを押してみましょう！",
-                3: "インターネット検索の結果から正しいページを探しましょう！",
-                4: "カメラで花や物を撮影して調べるGoogleレンズの練習です！",
-                5: "最後の仕上げ！あぶない詐欺から身を守る防犯テストです！"
-            };
-            document.getElementById('mascot-msg').innerText = mascotMsgs[num];
-        }
-
-        function handleInputFocus() {
-            document.getElementById('main-header').classList.add('compact');
-            document.getElementById('mascot-banner').classList.add('hidden');
-        }
-
-        function handleInputBlur() {
-            document.getElementById('main-header').classList.remove('compact');
-            document.getElementById('mascot-banner').classList.remove('hidden');
-        }
-
-        const ch1Input = document.getElementById('ch1-input');
-        ch1Input.addEventListener('input', (e) => {
-            const val = e.target.value;
-            if(val.includes('かなざわ')) {
-                document.getElementById('ch1-candidates').classList.remove('hidden');
-                document.getElementById('ch1-instruction').innerText = '② 上に出てきた変換候補の「金沢」をタッチしてね';
-                document.getElementById('key-space').classList.add('highlight');
-            }
-        });
-
-        function selectCh1Candidate(word) {
-            ch1Input.value = word;
-            document.getElementById('ch1-candidates').classList.add('hidden');
-            document.getElementById('ch1-instruction').innerText = '正しく入力できました！自動で次の「声で入力」に進みます...';
-            setTimeout(() => {
-                switchChapter(2);
-            }, 1200);
-        }
-
-        function triggerCh1Search() {
-            if(ch1Input.value.length > 0) {
-                switchChapter(2);
-            }
-        }
-
-        function startVoiceSearch() {
-            document.getElementById('voice-active-screen').classList.remove('hidden');
-        }
-
-        function finishVoiceSearch() {
-            document.getElementById('voice-active-screen').classList.add('hidden');
-            alert('「金沢の天気」と正しく認識されました！次の章へ進みます。');
-            switchChapter(3);
-        }
-
-        function executeSearchTransition() {
-            document.getElementById('ch3-view-input').classList.add('hidden');
-            document.getElementById('ch3-view-results').classList.remove('hidden');
-        }
-
-        function completeChapter3Results() {
-            alert('正解です！公式の天気予報ページを開けました。次の章へ進みます。');
-            switchChapter(4);
-        }
-
-        function openLensCamera() {
-            document.getElementById('ch4-view-bar').classList.add('hidden');
-            document.getElementById('ch4-view-camera').classList.remove('hidden');
-        }
-
-        function captureLensPhoto() {
-            document.getElementById('ch4-view-camera').classList.add('hidden');
-            document.getElementById('ch4-view-lens-results').classList.remove('hidden');
-        }
-
-        function completeChapter4Lens() {
-            alert('素晴らしい！たんぽぽの図解ページを見つけました。最終の防犯テストへ進みます！');
-            switchChapter(5);
-        }
-
-        function answerQuiz(isCorrect) {
-            if(isCorrect) {
-                quizIndex++;
-                if(quizIndex < quizData.length) {
-                    alert('正解です！');
-                    document.getElementById('quiz-question').innerText = quizData[quizIndex].q;
-                    const optContainer = document.getElementById('quiz-options');
-                    optContainer.innerHTML = '';
-                    quizData[quizIndex].options.forEach(opt => {
-                        const btn = document.createElement('button');
-                        btn.className = 'quiz-option';
-                        btn.innerText = opt.text;
-                        btn.onclick = () => answerQuiz(opt.correct);
-                        optContainer.appendChild(btn);
-                    });
-                } else {
-                    document.getElementById('quiz-container').classList.add('hidden');
-                    document.getElementById('certificate-screen').classList.remove('hidden');
-                }
-            } else {
-                alert('それは危険です！もう一度よく考えてみましょう。');
-            }
-        }
-    </script>
+renderStart();
+</script>
 </body>
 </html>
